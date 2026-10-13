@@ -3,9 +3,9 @@ import {promisify} from 'node:util';
 const scryptAsync=promisify(scrypt);
 const reject=(status,message,code)=>{throw Object.assign(new Error(message),{status,code});};
 export function securityConfig(env=process.env){
- const production=env.NODE_ENV==='production',demoEnabled=env.DEMO_MODE===undefined?!production:env.DEMO_MODE!=='false';
+ const production=env.NODE_ENV==='production',demoEnabled=env.NODE_ENV==='test'&&env.DEMO_MODE==='true';
  let origin;try{if(env.PUBLIC_ORIGIN)origin=new URL(env.PUBLIC_ORIGIN);}catch{throw Error('PUBLIC_ORIGIN inválido.');}
- if(production&&(demoEnabled||!origin||origin.protocol!=='https:'||origin.username||origin.password||origin.pathname!=='/'||origin.search||origin.hash||!env.SESSION_SECRET||env.SESSION_SECRET.length<48))throw Error('Producción requiere DEMO_MODE=false, PUBLIC_ORIGIN=https://dominio y SESSION_SECRET de al menos 48 caracteres.');
+ if(production&&(env.DEMO_MODE==='true'||!origin||origin.protocol!=='https:'||origin.username||origin.password||origin.pathname!=='/'||origin.search||origin.hash||!env.SESSION_SECRET||env.SESSION_SECRET.length<48))throw Error('Producción requiere DEMO_MODE=false, PUBLIC_ORIGIN=https://dominio y SESSION_SECRET de al menos 48 caracteres.');
  const secret=env.SESSION_SECRET||randomBytes(48).toString('hex');
  return {production,demoEnabled,origin:origin?.origin,secret,sessionCookie:production?'__Host-portal_session':'portal_session',csrfCookie:production?'__Host-portal_csrf':'portal_csrf',trusted:new Set((env.TRUSTED_PROXY_IPS||'127.0.0.1,::1,::ffff:127.0.0.1').split(',').map(s=>s.trim()).filter(Boolean)),heartbeat:Math.max(250,Math.min(30000,Number(env.SSE_HEARTBEAT_MS)||15000))};
 }

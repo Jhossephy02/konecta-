@@ -9,7 +9,7 @@ import {join} from 'node:path';
 
 test('aprovisionamiento: Superadmin real con demostración deshabilitada',async()=>{
  const dir=await mkdtemp(join(tmpdir(),'conecta-provision-')),path=join(dir,'production.sqlite');let server;
- const env={...process.env,DB_PATH:path,DEMO_MODE:'false',CONECTA_SUPERADMIN_EMAIL:'root@provision.test',CONECTA_SUPERADMIN_NAME:'Operador de prueba',CONECTA_SUPERADMIN_PASSWORD:'Clave-inicial-de-prueba-123'};
+ const env={...process.env,NODE_ENV:'test',DB_PATH:path,DEMO_MODE:'false',CONECTA_SUPERADMIN_EMAIL:'root@provision.test',CONECTA_SUPERADMIN_NAME:'Operador de prueba',CONECTA_SUPERADMIN_PASSWORD:'Clave-inicial-de-prueba-123'};
  try{
   const invalid=spawnSync(process.execPath,['server/provision.mjs'],{env:{...env,CONECTA_SUPERADMIN_PASSWORD:''},encoding:'utf8'});assert.equal(invalid.status,1);assert.equal(existsSync(path),false);
   const result=spawnSync(process.execPath,['server/provision.mjs'],{env,encoding:'utf8'});assert.equal(result.status,0);assert.ok(!result.stdout.includes(env.CONECTA_SUPERADMIN_PASSWORD));

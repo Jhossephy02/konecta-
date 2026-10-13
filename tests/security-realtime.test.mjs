@@ -9,7 +9,7 @@ import {securityConfig} from '../server/security.mjs';
 import {secureTestFetch,transportFetch} from './http-client.mjs';
 
 async function fixture(extra={}){
- const dir=await mkdtemp(join(tmpdir(),'conecta-security-')),env={...process.env,PORT:'0',DB_PATH:join(dir,'test.sqlite'),DEMO_MODE:'true',SSE_HEARTBEAT_MS:'250',...extra};
+ const dir=await mkdtemp(join(tmpdir(),'conecta-security-')),env={...process.env,NODE_ENV:'test',PORT:'0',DB_PATH:join(dir,'test.sqlite'),DEMO_MODE:'true',SSE_HEARTBEAT_MS:'250',...extra};
  if(extra.NODE_ENV==='production'){const r=spawnSync(process.execPath,['server/provision.mjs'],{env:{...env,CONECTA_SUPERADMIN_EMAIL:'root@security.test',CONECTA_SUPERADMIN_PASSWORD:'Clave-inicial-seguridad-123456'},encoding:'utf8'});assert.equal(r.status,0,r.stderr);}
  const server=spawn(process.execPath,['server/index.mjs'],{env,stdio:['ignore','pipe','pipe']});let output='';
  const base=await new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(Error(output)),10000);server.stderr.on('data',b=>{output+=b;if(extra.NODE_ENV==='production')process.stderr.write(b);});server.once('exit',c=>{clearTimeout(timer);reject(Error(c+': '+output));});server.stdout.on('data',b=>{output+=b;const m=output.match(/http:\/\/127\.0\.0\.1:\d+/);if(m){clearTimeout(timer);resolve(m[0]);}});});
@@ -19,6 +19,11 @@ async function fixture(extra={}){
 }
 
 test('TOTP cumple los vectores SHA-1 de RFC 6238',()=>{const secret=base32(Buffer.from('12345678901234567890'));for(const[time,code]of[[59,'94287082'],[1111111109,'07081804'],[1111111111,'14050471'],[1234567890,'89005924'],[2000000000,'69279037'],[20000000000,'65353130']])assert.equal(totp(secret,time*1000,8),code);});
+test('las cuentas ficticias solo se habilitan explícitamente en pruebas',()=>{
+ assert.equal(securityConfig({}).demoEnabled,false);
+ assert.equal(securityConfig({NODE_ENV:'development',DEMO_MODE:'true'}).demoEnabled,false);
+ assert.equal(securityConfig({NODE_ENV:'test',DEMO_MODE:'true'}).demoEnabled,true);
+});
 test('producción rechaza configuraciones inseguras',()=>{assert.throws(()=>securityConfig({NODE_ENV:'production',DEMO_MODE:'true'}));assert.throws(()=>securityConfig({NODE_ENV:'production',DEMO_MODE:'false',PUBLIC_ORIGIN:'http://grupoamayo.com',SESSION_SECRET:'x'.repeat(64)}));assert.throws(()=>securityConfig({NODE_ENV:'production',DEMO_MODE:'false',PUBLIC_ORIGIN:'https://grupoamayo.com'}));const c=securityConfig({NODE_ENV:'production',PUBLIC_ORIGIN:'https://grupoamayo.com',SESSION_SECRET:'x'.repeat(64)});assert.equal(c.demoEnabled,false);assert.equal(c.sessionCookie,'__Host-portal_session');});
 
 test('ataques HTTP: CSRF, sesiones, rutas y contenido',async t=>{

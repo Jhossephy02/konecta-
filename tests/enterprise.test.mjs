@@ -9,7 +9,7 @@ import {roles} from '../server/access.mjs';
 
 test('empresa: matriz de cargos, jerarquía, privacidad y separación de empresas',async t=>{
  const dir=await mkdtemp(join(tmpdir(),'conecta-enterprise-'));
- const server=spawn(process.execPath,['server/index.mjs'],{env:{...process.env,PORT:'0',DEMO_MODE:'true',DB_PATH:join(dir,'enterprise.sqlite')},stdio:['ignore','pipe','pipe']});
+ const server=spawn(process.execPath,['server/index.mjs'],{env:{...process.env,NODE_ENV:'test',PORT:'0',DEMO_MODE:'true',DB_PATH:join(dir,'enterprise.sqlite')},stdio:['ignore','pipe','pipe']});
  let base,output='';
  const ready=new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(Error(output)),10000);server.stderr.on('data',b=>output+=b);server.once('exit',code=>{clearTimeout(timer);reject(Error('Inicio: '+code+output));});server.stdout.on('data',b=>{output+=b;const m=output.match(/http:\/\/127\.0\.0\.1:\d+/);if(m){base=m[0];clearTimeout(timer);resolve();}});});
  const call=async(path,method='GET',value,cookie='',headers={})=>{const r=await fetch(base+'/api'+path,{method,headers:{Cookie:cookie,...(value instanceof Buffer?{}:{'Content-Type':'application/json'}),...headers},body:value===undefined?undefined:value instanceof Buffer?value:JSON.stringify(value)});return {status:r.status,data:r.headers.get('content-type')?.includes('json')?await r.json():await r.text(),cookie:r.headers.get('set-cookie')?.split(';')[0]};};

@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS responses(content_id TEXT NOT NULL REFERENCES content
 CREATE TABLE IF NOT EXISTS files(id TEXT PRIMARY KEY,record_id TEXT NOT NULL REFERENCES records(id),name TEXT NOT NULL,mime TEXT NOT NULL,bytes BLOB NOT NULL,created TEXT NOT NULL);`);
 db.exec('CREATE TABLE IF NOT EXISTS course_catalog(id TEXT PRIMARY KEY,data TEXT NOT NULL)');
 const identity=createIdentity(db);
-for(const course of courses)db.prepare('INSERT OR IGNORE INTO course_catalog(id,data) VALUES(?,?)').run(course.id,JSON.stringify(course));
+if(config.demoEnabled)for(const course of courses)db.prepare('INSERT OR IGNORE INTO course_catalog(id,data) VALUES(?,?)').run(course.id,JSON.stringify(course));
 const allCourses=user=>org.corporate.catalog(user);
 const hashPassword = (password,salt=randomBytes(16).toString('hex')) => salt+':'+scryptSync(password,salt,64).toString('hex');
 const verifyPassword = (password,stored) => {const [salt,hash]=stored.split(':');return timingSafeEqual(Buffer.from(hash,'hex'),scryptSync(password,salt,64));};

@@ -11,7 +11,7 @@ test('importación rechaza preguntas sin respuesta o letras fuera de orden',()=>
  assert.throws(()=>parseQuestions('PREGUNTA: Prueba\nB) Uno\nA) Dos\nRESPUESTA: B'));
 });
 test('materiales, importación y expediente respetan asignación, privacidad y cumpleaños',async()=>{
- const dir=await mkdtemp(join(tmpdir(),'conecta-materials-')),server=spawn(process.execPath,['server/index.mjs'],{env:{...process.env,NODE_ENV:'development',DEMO_MODE:'true',PORT:'0',DB_PATH:join(dir,'test.sqlite')},stdio:['ignore','pipe','pipe']});let output='';
+ const dir=await mkdtemp(join(tmpdir(),'conecta-materials-')),server=spawn(process.execPath,['server/index.mjs'],{env:{...process.env,NODE_ENV:'test',DEMO_MODE:'true',PORT:'0',DB_PATH:join(dir,'test.sqlite')},stdio:['ignore','pipe','pipe']});let output='';
  try{
  const base=await new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(Error(output)),10000);server.stderr.on('data',b=>output+=b);server.stdout.on('data',b=>{output+=b;const m=output.match(/http:\/\/127\.0\.0\.1:\d+/);if(m){clearTimeout(timer);resolve(m[0]+'/api');}});server.once('exit',()=>reject(Error(output)));});
  const call=async(p,method='GET',body,cookie='')=>{const r=await secureTestFetch(base+p,{method,headers:{Cookie:cookie,'Content-Type':'application/json'},body:body===undefined?undefined:JSON.stringify(body)});return {status:r.status,data:await r.json(),cookie:r.headers.get('set-cookie')?.split(';')[0]};};

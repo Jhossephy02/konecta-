@@ -9,7 +9,7 @@ import {logoPng} from './logo-fixture.mjs';
 
 test('SaaS: Superadmin, alta de empresas, marca y permisos de cursos',async t=>{
  const dir=await mkdtemp(join(tmpdir(),'conecta-corporate-'));
- const server=spawn(process.execPath,['server/index.mjs'],{env:{...process.env,PORT:'0',DEMO_MODE:'true',DB_PATH:join(dir,'test.sqlite')},stdio:['ignore','pipe','pipe']});let base,output='';
+ const server=spawn(process.execPath,['server/index.mjs'],{env:{...process.env,NODE_ENV:'test',PORT:'0',DEMO_MODE:'true',DB_PATH:join(dir,'test.sqlite')},stdio:['ignore','pipe','pipe']});let base,output='';
  const ready=new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(Error(output)),10000);server.once('exit',code=>{clearTimeout(timer);reject(Error(code+': '+output));});server.stderr.on('data',b=>output+=b);server.stdout.on('data',b=>{output+=b;const m=output.match(/http:\/\/127\.0\.0\.1:\d+/);if(m){base=m[0];clearTimeout(timer);resolve();}});});
  const call=async(path,method='GET',body,cookie='',headers={})=>{const binary=Buffer.isBuffer(body),r=await fetch(base+'/api'+path,{method,headers:{Cookie:cookie,...(binary?{}:{'Content-Type':'application/json'}),...headers},body:body===undefined?undefined:binary?body:JSON.stringify(body)});return{status:r.status,data:r.headers.get('content-type')?.includes('json')?await r.json():r.headers.get('content-type')?.startsWith('image/')?Buffer.from(await r.arrayBuffer()):await r.text(),cookie:r.headers.get('set-cookie')?.split(';')[0]};};
  let root,owner,otherOwner,employee,manager,company,id,managerId,course;
