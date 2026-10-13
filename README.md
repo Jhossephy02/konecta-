@@ -118,3 +118,7 @@ Lee `docs/INSPECCION.md` para ver cada función observada, su adaptación y los 
 Esta entrega permite entregar boletas PDF preparadas por la empresa; no calcula nómina ni importes. No sincroniza con las plataformas originales, no firma certificados ni aplica automáticamente políticas laborales. Los módulos con permisos restringidos o sin asignaciones no pueden afirmarse como réplicas verificadas completas.
 
 # konecta-
+
+## Presentación comercial
+
+Con el servidor iniciado, abre `/brand/video.html` para reproducir y descargar el anuncio de Conecta con voz femenina. La versión animada editable está en `/brand/anuncio.html`. Guion y detalle de archivos: [docs/ANUNCIO-COMERCIAL.md](docs/ANUNCIO-COMERCIAL.md). La empresa de práctica «El Reino de las Alas · Demostración» conserva los datos ficticios de la simulación; no se ejecutó la limpieza cancelada.
