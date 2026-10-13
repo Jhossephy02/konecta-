@@ -12,7 +12,9 @@ export const roles = [
 ];
 export const companyRoles=roles.filter(r=>r.id!=='superadmin');
 let policyProvider=()=>({});
-export function configurePolicies(provider){policyProvider=provider;}
+let accountPolicyProvider=()=>({});
+export const delegablePermissions=['publish','teach','manageCourses','assignCourses','workforce','payroll','audit','approveLabor','approveJustifications','approveSafety','approveMedical'];
+export function configurePolicies(provider,accounts=()=>({})){policyProvider=provider;accountPolicyProvider=accounts;}
 export const owner=user=>['admin','superadmin'].includes(user.role);
 export const tenant = user => JSON.parse(user.profile).companyId || 'demo-company';
 export const medical = new Set(['resultados','descansos','gestantes','citas']);
@@ -43,13 +45,19 @@ export function canRead(user,record,users){
 }
 export function canResolve(user,record,users){
   if(record.user_id===user.id||!canRead(user,record,users))return false;
-  return owner(user)||(user.role==='hr'&& (labor.has(record.module)||medical.has(record.module)))||(user.role==='sst'&&!labor.has(record.module))||(['supervisor','manager','deputy'].includes(user.role)&&record.module==='justificaciones');
+  if(owner(user))return true;
+  const p=permissionSummary(user);
+  if(record.module==='justificaciones')return p.approveJustifications;
+  if(medical.has(record.module))return p.approveMedical;
+  return labor.has(record.module)?p.approveLabor:p.approveSafety;
 }
 export function canReview(user,record,users){return record.user_id!==user.id&&['supervisor','manager','deputy'].includes(user.role)&&canRead(user,record,users);}
 export function permissionSummary(user){
-  const full=owner(user),defaults={publish:full||['hr','trainer','sst'].includes(user.role),teach:full||user.role==='trainer',manageCourses:full||user.role==='trainer',assignCourses:full||user.role==='trainer',payroll:full||user.role==='payroll',users:full,workforce:full||['hr','trainer','manager','deputy','supervisor'].includes(user.role),audit:full||user.role==='hr',platform:user.role==='superadmin'};
+  const full=owner(user),defaults={publish:full||['hr','trainer','sst'].includes(user.role),teach:full||user.role==='trainer',manageCourses:full||user.role==='trainer',assignCourses:full||user.role==='trainer',payroll:full||user.role==='payroll',users:full,workforce:full||['hr','trainer','manager','deputy','supervisor'].includes(user.role),audit:full||user.role==='hr',platform:user.role==='superadmin',approveLabor:full||user.role==='hr',approveJustifications:full||['hr','supervisor','manager','deputy'].includes(user.role),approveSafety:full||user.role==='sst',approveMedical:full||['hr','sst'].includes(user.role)};
   if(full)return defaults;
   const overrides=policyProvider(tenant(user),user.role)||{};
   for(const key of ['publish','teach','manageCourses','assignCourses','workforce'])if(typeof overrides[key]==='boolean')defaults[key]=overrides[key];
+  const account=accountPolicyProvider(tenant(user),user.id)||{};
+  for(const key of delegablePermissions)if(typeof account[key]==='boolean')defaults[key]=account[key];
   return defaults;
 }

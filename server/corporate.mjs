@@ -11,7 +11,8 @@ export function corporate({db,fail,text,json,body,hashPassword,companyUsers,audi
     CREATE TABLE IF NOT EXISTS company_logos(company_id TEXT PRIMARY KEY,mime TEXT NOT NULL,bytes BLOB NOT NULL);`);
   if(!db.prepare('PRAGMA table_info(sessions)').all().some(c=>c.name==='company_id'))db.exec('ALTER TABLE sessions ADD COLUMN company_id TEXT');
   if(!db.prepare('PRAGMA table_info(course_catalog)').all().some(c=>c.name==='active'))db.exec('ALTER TABLE course_catalog ADD COLUMN active INTEGER NOT NULL DEFAULT 1');
-  configurePolicies((company,role)=>JSON.parse(db.prepare('SELECT permissions FROM role_permissions WHERE company_id=? AND role=?').get(company,role)?.permissions||'{}'));
+  db.exec('CREATE TABLE IF NOT EXISTS user_permissions(company_id TEXT NOT NULL,user_id TEXT NOT NULL REFERENCES users(id),permissions TEXT NOT NULL,PRIMARY KEY(company_id,user_id))');
+  configurePolicies((company,role)=>JSON.parse(db.prepare('SELECT permissions FROM role_permissions WHERE company_id=? AND role=?').get(company,role)?.permissions||'{}'),(company,id)=>JSON.parse(db.prepare('SELECT permissions FROM user_permissions WHERE company_id=? AND user_id=?').get(company,id)?.permissions||'{}'));
   const info=user=>{const c=db.prepare('SELECT id,name,slug,accent,active,brand_version FROM companies WHERE id=?').get(tenant(user))||{id:'platform',name:'Conecta · Plataforma',slug:'plataforma',accent:'#0F766E',active:1};return {...c,logo:!!db.prepare('SELECT 1 FROM company_logos WHERE company_id=?').get(c.id)};};
   const catalog=user=>db.prepare('SELECT * FROM course_catalog ORDER BY rowid').all().filter(r=>{
     const c=JSON.parse(r.data),builtIn=['epp','bienvenida','prevencion','cultura'].includes(r.id);

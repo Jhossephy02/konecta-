@@ -1,5 +1,5 @@
 import {randomUUID,randomBytes} from 'node:crypto';
-import {roles,companyRoles,tenant,owner,canRead,canResolve,canReview,payroll,permissionSummary,reportsTo,teaching,publishing} from './access.mjs';
+import {roles,companyRoles,tenant,owner,canRead,canResolve,canReview,payroll,permissionSummary,reportsTo,teaching,publishing,delegablePermissions} from './access.mjs';
 import {corporate} from './corporate.mjs';
 
 export function enterprise({db,fail,text,json,body,hashPassword,demoEnabled}){
@@ -32,6 +32,13 @@ export function enterprise({db,fail,text,json,body,hashPassword,demoEnabled}){
       const people=companyUsers(user),p=permissionSummary(user);
       const staff=p.users||p.payroll||user.role==='hr'?people.map(u=>({id:u.id,loginId:db.prepare('SELECT identifier FROM login_identifiers WHERE user_id=?').get(u.id)?.identifier||u.email,name:u.name,role:u.role,...Object.fromEntries(['area','position','site','supervisorId'].map(k=>[k,JSON.parse(u.profile)[k]||'']))})):[];
       return json(res,200,{name:companyName(user),roles:companyRoles,permissions:p,staff});
+    }
+    const accountAccess=path.match(/^\/api\/organization\/users\/([\w-]+)\/permissions$/);
+    if(accountAccess){
+      if(!owner(user))fail(403,'Solo el dueño puede configurar permisos por cuenta.');const target=companyUsers(user).find(u=>u.id===accountAccess[1]);if(!target||owner(target))fail(404,'Selecciona una cuenta de trabajador de tu empresa.');
+      const current=()=>JSON.parse(db.prepare('SELECT permissions FROM user_permissions WHERE company_id=? AND user_id=?').get(tenant(user),target.id)?.permissions||'{}');
+      if(method==='GET')return json(res,200,{overrides:current(),effective:permissionSummary(target),inherited:permissionSummary({...target,id:'__role_baseline__'}),allowed:delegablePermissions});
+      if(method==='PUT'){const b=await body(req),values=b.permissions;if(!values||Array.isArray(values)||typeof values!=='object'||Object.keys(values).some(k=>!delegablePermissions.includes(k))||Object.values(values).some(v=>v!==null&&typeof v!=='boolean'))fail(400,'Permisos inválidos.');const permissions=Object.fromEntries(Object.entries(values).filter(([,v])=>v!==null));db.exec('BEGIN IMMEDIATE');try{db.prepare('INSERT INTO user_permissions VALUES(?,?,?) ON CONFLICT(company_id,user_id) DO UPDATE SET permissions=excluded.permissions').run(tenant(user),target.id,JSON.stringify(permissions));db.prepare('DELETE FROM sessions WHERE user_id=?').run(target.id);audit(user,'Permisos individuales actualizados',target.id);db.exec('COMMIT');}catch(e){db.exec('ROLLBACK');throw e;}return json(res,200,{ok:true});}
     }
     const member=path.match(/^\/api\/organization\/users\/([\w-]+)$/);
     if(member&&method==='PATCH'){
@@ -87,3 +94,4 @@ export function enterprise({db,fail,text,json,body,hashPassword,demoEnabled}){
   }
   return {route,users,companyUsers,visible,companyName,audit,corporate:corp};
 }
+
