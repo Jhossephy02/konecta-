@@ -25,3 +25,9 @@ El lector permite ajustar el texto de 18 a 24 px durante la sesión del curso. L
 La administración conserva sus tablas en escritorio y permite desplazarlas dentro de su contenedor en pantallas pequeñas, con la primera columna fija. Los formularios se organizan en una columna en celular y los botones de los diálogos se distribuyen según el espacio disponible.
 
 Validación local en el navegador de Codex: administración a 390 × 844 y 1440 × 900; curso a 768 × 1024 y evaluación a 1024 × 768, sin desbordamiento horizontal del documento observado. Se comprobó el ajuste a 20 px, el avance de tres lecciones y el bloqueo/habilitación del envío según las respuestas. No se envió esa evaluación de prueba. Sigue pendiente la validación en tablet física y Brave.
+
+## Menú y alineación
+
+Corregido el 13 de octubre de 2026: el fondo del menú cubre todo el intervalo de tablet, también por encima de 900 px. Incluye cierre visible, cierre con Escape y bloqueo de interacción con el contenido mientras está abierto. En escritorio con puntero fino desde 1101 px, el menú queda fijo y el contenido reserva su ancho; en pantallas mayores de 1366 px también permanece fijo. Cambiar a escritorio cierra el estado desplegable.
+
+Se comprobó a 1280 × 900 que el menú termina en x=248 y el contenido comienza en x=248, sin solapamiento. A 1024 × 768 se verificó fondo fijo, cierre visible, Escape y cierre automático al ampliar a escritorio. Cuando no hay cursos asignados, Inicio muestra ese estado y no presenta un indicador 0/0 ni afirma que se completaron cursos.
