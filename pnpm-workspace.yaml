@@ -1,2 +1,6 @@
 allowBuilds:
   '@fortawesome/fontawesome-free': true
+
+# Mammoth uses this only for its CLI; v2 removes the vulnerable sprintf-js dependency.
+overrides:
+  'mammoth>argparse': 2.0.1

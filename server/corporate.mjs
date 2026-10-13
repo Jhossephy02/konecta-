@@ -40,7 +40,7 @@ export function corporate({db,fail,text,json,body,hashPassword,companyUsers,audi
     }
     if(path==='/api/platform/companies'&&method==='GET'){
       if(user.role!=='superadmin')fail(403,'Solo el Superadmin administra empresas.');
-      return json(res,200,db.prepare("SELECT * FROM companies WHERE id!='platform' ORDER BY name").all().map(c=>({...c,users:db.prepare('SELECT id,profile FROM users').all().filter(u=>tenant(u)===c.id).length,courses:db.prepare('SELECT COUNT(*) n FROM course_catalog WHERE company_id=?').get(c.id).n})));
+      return json(res,200,db.prepare("SELECT * FROM companies WHERE id!='platform' ORDER BY name").all().map(c=>({...c,logo:!!db.prepare('SELECT 1 FROM company_logos WHERE company_id=?').get(c.id),users:db.prepare('SELECT id,profile FROM users').all().filter(u=>tenant(u)===c.id).length,courses:db.prepare('SELECT COUNT(*) n FROM course_catalog WHERE company_id=?').get(c.id).n})));
     }
     if(path==='/api/platform/companies'&&method==='POST'){
       if(user.role!=='superadmin')fail(403,'Solo el Superadmin puede dar de alta empresas.');

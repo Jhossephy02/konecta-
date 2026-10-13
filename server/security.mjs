@@ -17,7 +17,7 @@ export function createSecurity({db,config,userFor,permissions}){
  const mac=(req,nonce)=>createHmac('sha256',config.secret).update(sessionHash(req)+':'+nonce).digest('hex');
  function headers(req,res){
   res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('X-Frame-Options','DENY');res.setHeader('Referrer-Policy','same-origin');res.setHeader('Cross-Origin-Resource-Policy','same-origin');res.setHeader('Permissions-Policy','camera=(), microphone=(), geolocation=()');
-  res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'");
+  res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self'; media-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'");
   if(config.production){
    res.setHeader('Strict-Transport-Security','max-age=31536000');
    if(req.headers.host!==new URL(config.origin).host)reject(421,'Dominio no permitido.','HOST');
@@ -32,7 +32,7 @@ export function createSecurity({db,config,userFor,permissions}){
    const nonce=cookie(req,config.csrfCookie),token=req.headers['x-csrf-token'];
    if(!/^[a-f0-9]{48}$/.test(nonce)||typeof token!=='string'||!/^[a-f0-9]{64}$/.test(token)||!timingSafeEqual(Buffer.from(token,'hex'),Buffer.from(mac(req,nonce),'hex')))reject(403,'Actualiza la protección del formulario.','CSRF');
    const path=new URL(req.url,'http://localhost').pathname;
-   if(!(/\/attachment$|\/logo$|^\/api\/company-logo$|^\/api\/payroll$/.test(path))&&!(req.headers['content-type']||'').toLowerCase().startsWith('application/json'))reject(415,'Se requiere application/json.','CONTENT_TYPE');
+   if(!(/\/attachment$|\/logo$|^\/api\/company-logo$|^\/api\/payroll$|^\/api\/(?:learning-assets|question-import|employee-documents)$/.test(path))&&!(req.headers['content-type']||'').toLowerCase().startsWith('application/json'))reject(415,'Se requiere application/json.','CONTENT_TYPE');
   }
  }
  function csrf(req,res){const nonce=randomBytes(24).toString('hex');res.setHeader('Set-Cookie',`${config.csrfCookie}=${nonce}; ${cookieFlags}; Max-Age=28800`);return mac(req,nonce);}
