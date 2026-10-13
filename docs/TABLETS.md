@@ -17,3 +17,11 @@ Las respuestas de una evaluación todavía no enviada no se guardan. Cerrar el n
 ## Verificación
 
 Se revisó el curso de bienvenida en 768 × 1024 y 1024 × 768: sin desbordamiento horizontal observado, botones de avance de 48 px, opciones de evaluación de 58 px, lecciones secuenciales, modo lectura, aprobación y diálogo para cambio de trabajador. Estas pruebas emulan tamaños de pantalla en navegador; queda pendiente probar el modelo físico de tablet y su navegador.
+
+## Mejoras de lectura y administración · 13 de octubre de 2026
+
+El lector permite ajustar el texto de 18 a 24 px durante la sesión del curso. La evaluación conserva las selecciones al volver a las lecciones, resalta la opción elegida y muestra cuántas preguntas están respondidas; el envío se habilita al responder todas. Las respuestas sin enviar se mantienen únicamente en memoria y se pierden al salir del curso o cerrar sesión.
+
+La administración conserva sus tablas en escritorio y permite desplazarlas dentro de su contenedor en pantallas pequeñas, con la primera columna fija. Los formularios se organizan en una columna en celular y los botones de los diálogos se distribuyen según el espacio disponible.
+
+Validación local en el navegador de Codex: administración a 390 × 844 y 1440 × 900; curso a 768 × 1024 y evaluación a 1024 × 768, sin desbordamiento horizontal del documento observado. Se comprobó el ajuste a 20 px, el avance de tres lecciones y el bloqueo/habilitación del envío según las respuestas. No se envió esa evaluación de prueba. Sigue pendiente la validación en tablet física y Brave.

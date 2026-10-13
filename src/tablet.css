@@ -102,3 +102,17 @@
 @media(max-width:600px){.u-shift-button>span{display:none}.u-shift-button{padding:12px!important}.u-study-tools{align-items:stretch}.u-study-tools>.u-btn{width:100%}.unified .u-lesson-copy{font-size:17px;line-height:1.85}.unified .u-lesson .u-radio{min-height:52px;font-size:16px;padding:14px}.unified .u-lesson footer{display:flex;flex-direction:column;align-items:stretch;gap:14px}.unified .u-lesson footer>.u-btn{width:100%}.u-outline-body>button{font-size:14px}.unified .u-topbar{gap:6px}.unified .u-notification-button{display:none}.unified .u-global-search input{min-width:0;width:100%}.unified .u-topbar .u-search{padding:0 10px}.u-study-focus .u-lesson-copy{font-size:18px}}
 @media(prefers-reduced-motion:reduce){.unified *,.unified *::before,.unified *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 @media print{.u-study-tools,.u-shift-button{display:none!important}}
+/* Learning controls remain independent of the administrative workspace. */
+.unified .u-reading-controls{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin:0 0 22px;padding:12px 16px;border:1px solid #e3e8ef;border-radius:14px;background:#fff}
+.u-reading-controls>span{font-weight:650;margin-right:4px}.u-reading-controls>output{min-width:42px;text-align:center;font-variant-numeric:tabular-nums}.u-reading-controls>small{margin-left:auto;color:#596779;line-height:1.6}
+.unified .u-study .u-lesson-copy,.unified .u-study-focus .u-lesson-copy{font-size:var(--study-text-size,18px);line-height:1.85;max-width:70ch;overflow-wrap:anywhere}
+.unified .u-quiz-progress{padding:16px;border-radius:12px;background:var(--brand-soft);color:var(--brand-text);line-height:1.7}
+.unified .u-lesson .u-radio.selected{border-color:var(--brand);background:var(--brand-soft);box-shadow:inset 3px 0 var(--brand)}
+.unified .u-lesson fieldset{min-width:0}.unified .u-lesson legend{max-width:100%;overflow-wrap:anywhere}
+.unified .u-lesson footer{flex-wrap:wrap}.unified .u-lesson footer .u-btn{min-height:52px}
+.unified .u-table-scroll{max-width:100%;overflow:auto;overscroll-behavior-x:contain;scrollbar-gutter:stable;border-radius:12px}
+.unified .u-table-scroll th{white-space:nowrap}.unified .u-table-scroll td{overflow-wrap:anywhere}
+.unified .u-form-grid>*{min-width:0}.unified .u-panel{min-width:0}
+@media(pointer:coarse){.unified .u-study .u-btn{min-height:52px}.unified .u-lesson .u-radio{min-height:60px}.unified .u-lesson footer{padding-bottom:max(12px,env(safe-area-inset-bottom))}}
+@media(max-width:800px){.unified .u-table-scroll table{min-width:660px}.unified .u-table-scroll th:first-child,.unified .u-table-scroll td:first-child{position:sticky;left:0;z-index:1;background:#fff;box-shadow:2px 0 0 #e8edf3;max-width:190px}.unified .u-page-head{flex-wrap:wrap;gap:16px}.unified .u-page-head>.u-btn{max-width:100%;white-space:normal}.unified .u-modal footer{display:flex;flex-wrap:wrap;gap:12px}.unified .u-modal footer>.u-btn{flex:1 1 180px}}
+@media(max-width:600px){.u-reading-controls>small{flex-basis:100%;margin-left:0}.unified .u-reading-controls{padding:12px}.unified .u-lesson{padding:20px}.unified .u-form-grid{grid-template-columns:minmax(0,1fr)}.unified .u-study-tools>.u-back{min-height:48px;display:flex;align-items:center}}
