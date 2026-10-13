@@ -1,0 +1,12 @@
+import {DatabaseSync,backup} from 'node:sqlite';
+import {mkdirSync} from 'node:fs';
+import {dirname,resolve} from 'node:path';
+import {fileURLToPath} from 'node:url';
+const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
+const source=process.env.DB_PATH||resolve(root,'data/portal.sqlite');
+const target=resolve(process.env.BACKUP_DIR||resolve(root,'backups'),`portal-${new Date().toISOString().replaceAll(':','-')}.sqlite`);
+mkdirSync(dirname(target),{recursive:true});
+const db=new DatabaseSync(source,{readOnly:true});
+await backup(db,target);db.close();
+const copy=new DatabaseSync(target,{readOnly:true});const result=copy.prepare('PRAGMA integrity_check').all();copy.close();if(result.some(row=>Object.values(row)[0]!=='ok'))throw Error('El respaldo no pasó la verificación de integridad.');
+console.log(`Respaldo guardado: ${target}`);

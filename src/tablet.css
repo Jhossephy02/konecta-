@@ -1,0 +1,104 @@
+/* Motion uses opacity/transform only, with a static reduced-motion alternative. */
+@keyframes conecta-enter{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes conecta-pop{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:scale(1)}}
+@keyframes conecta-progress{from{opacity:.5}to{opacity:1}}
+.u-page-stage{animation:conecta-enter .32s cubic-bezier(.2,.7,.2,1) both}
+.u-course-grid>.u-course-card{animation:conecta-enter .4s ease both}
+.u-course-grid>.u-course-card:nth-child(2){animation-delay:45ms}
+.u-course-grid>.u-course-card:nth-child(3){animation-delay:90ms}
+.u-course-grid>.u-course-card:nth-child(4){animation-delay:135ms}
+.u-modal[open]{animation:conecta-pop .2s ease both}
+.u-toast{animation:conecta-enter .24s ease both}
+.u-lesson{animation:conecta-enter .3s ease both;scroll-margin-top:95px}
+.u-result.passed{animation:conecta-pop .35s cubic-bezier(.2,.8,.2,1) both}
+.unified .u-btn,.unified .u-icon,.unified .u-tabs button,.unified .u-course-card,.unified .u-shortcuts>a{transition:transform .18s ease,box-shadow .18s ease,background-color .18s ease,border-color .18s ease}
+.unified .u-btn:active,.unified .u-icon:active,.unified .u-tabs button:active{transform:scale(.97)}
+.unified :is(button,a,input,select,textarea):focus-visible{outline:3px solid var(--brand,#EC5B2A);outline-offset:4px}
+.unified :is(button,a,input,select,textarea){touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.unified .u-progress>span{transition:width .45s cubic-bezier(.2,.7,.2,1)}
+.u-shift-button{display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.u-study-tools{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:20px}
+.u-study-tools>.u-back{margin:0}
+.u-outline-heading{display:flex;align-items:center;gap:12px;justify-content:space-between}
+.u-outline-heading h3{margin:0;font-size:15px}
+.u-outline-heading button{flex-shrink:0}
+.u-outline-body[hidden]{display:none!important}
+.u-outline-body>.u-progress{margin-top:20px}
+.u-outline-body>small{display:block;margin:10px 0 18px;color:#637083}
+.u-outline-body>button{display:flex;align-items:center;gap:12px;width:100%;min-height:48px;padding:12px 10px;border:0;border-radius:9px;background:transparent;text-align:left;line-height:1.5;color:#475564;font-size:14px}
+.u-outline-body>button.active{background:var(--brand-soft);color:var(--brand-text);font-weight:650}
+.u-outline-body>button:disabled{opacity:.5;cursor:not-allowed}
+.u-outline-body>button>span{width:24px;flex-shrink:0}
+.u-outline-body>button>i{margin-left:auto}
+.u-study-focus .u-player{grid-template-columns:minmax(0,1fr);max-width:960px;margin:auto}
+.u-study-focus .u-player>aside{display:none}
+.u-study-focus .u-lesson-copy{font-size:19px;line-height:1.95;max-width:70ch;color:#374151}
+.u-study-focus .u-lesson-art{height:140px}
+.unified .u-lesson-copy>p{font:inherit;color:inherit;margin:0 0 18px}
+.unified .u-study-focus .u-lesson-copy{font-size:20px;line-height:1.85;color:#374151}
+.u-study-focus .u-lesson>h2{font-size:30px}
+.u-session-summary{background:var(--brand-soft,#f6f7f9);border-radius:12px;padding:18px;line-height:1.7}
+@media(hover:hover) and (pointer:fine){.unified .u-course-card:hover{transform:translateY(-4px);box-shadow:0 12px 28px #26334512}.unified .u-shortcuts>a:hover{transform:translateY(-2px)}.unified .u-btn:hover{box-shadow:0 4px 12px #26334512}}
+/* Tablets: keep a full-width workspace in portrait and landscape. */
+@media(min-width:601px) and (max-width:1366px){
+ .unified .u-sidebar{width:290px;transform:translateX(-100%);transition:transform .22s ease}
+ .unified .u-sidebar.open{transform:translateX(0)}
+ .unified .u-body{margin-left:0}
+ .unified .u-mobile-menu{display:inline-flex}
+ .unified .u-main{padding:26px 30px 0}
+ .unified .u-topbar{padding:15px 24px;gap:14px;min-height:78px}
+ .unified .u-topbar .u-global-search{flex:1;min-width:100px}
+ .unified .u-user>span:not(.u-avatar),.unified .u-user>i,.unified .u-local-badge{display:none}
+ .unified .u-course-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
+ .unified .u-course-body{padding:24px}
+ .unified .u-course-body h3{font-size:20px;line-height:1.4}
+ .unified .u-course-body>p{font-size:15px;line-height:1.7}
+ .unified .u-course-body>small,.unified .u-course-foot{font-size:13px}
+ .unified .u-course-foot>a{display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:10px 14px;border-radius:9px;background:var(--brand-soft);color:var(--brand-text);font-size:15px;font-weight:650}
+ .unified .u-page-head h1{font-size:29px;line-height:1.3}
+ .unified .u-page-head p{font-size:16px;line-height:1.6}
+ .unified .u-lesson{padding:30px}
+ .unified .u-lesson-copy{font-size:18px;line-height:1.9;color:#374151}
+ .unified .u-lesson>h2{font-size:26px;line-height:1.4}
+ .unified .u-lesson>p,.unified .u-lesson-note p{font-size:16px;line-height:1.7}
+ .unified .u-lesson-art{height:155px}
+ .unified .u-player{grid-template-columns:260px minmax(0,1fr);gap:22px}
+ .unified .u-lesson fieldset{padding:20px;margin:24px 0}
+ .unified .u-lesson legend{font-size:18px;line-height:1.6}
+ .unified .u-lesson .u-radio{font-size:16px;line-height:1.6;min-height:58px;padding:16px;gap:14px;border-radius:12px}
+ .unified .u-lesson input[type=radio]{width:22px;height:22px;flex-shrink:0;accent-color:var(--brand)}
+ .unified .u-lesson footer{position:sticky;bottom:0;background:#fff;padding:18px 0 6px;border-top:1px solid #e5e8ed;z-index:2;gap:14px}
+ .unified .u-lesson footer>span{font-size:14px}
+ .unified .u-modal{width:min(760px,calc(100% - 40px));padding:28px;max-height:calc(100dvh - 48px);overflow:auto}
+ .unified .u-modal>header h2{font-size:23px}
+ .unified .u-modal label{font-size:16px}
+ .unified .u-sidebar nav a,.unified .u-sidebar-bottom :is(a,button){min-height:48px;font-size:14px;padding:12px}
+ .unified .u-sidebar nav a>i{font-size:17px}
+ .unified .u-tenant-brand img{max-height:105px;width:190px}
+ .unified .u-tabs{gap:8px;flex-wrap:wrap}
+ .unified .u-tabs button{min-height:48px;padding:12px 18px;font-size:15px}
+ .unified .u-learning-banner h2{font-size:23px}
+ .unified .u-learning-banner p{font-size:15px;line-height:1.7}
+ .unified .u-learning-banner>span{font-size:28px}
+ .unified .u-study-focus .u-player{grid-template-columns:1fr}
+}
+@media(min-width:601px) and (max-width:1000px){
+ .unified .u-player{grid-template-columns:1fr}
+ .unified .u-player>aside{padding:20px}
+ .unified .u-outline-body{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 12px}
+ .unified .u-outline-body>.u-progress,.unified .u-outline-body>small{grid-column:1/-1}
+ .unified .u-home-columns{grid-template-columns:1fr}
+ .unified .u-topbar .u-global-search input{font-size:15px}
+ .unified .u-shift-button{font-size:13px!important;padding:10px 12px}
+}
+@media(pointer:coarse),(max-width:1366px){
+ .unified .u-btn,.unified .u-icon,.unified .u-text-btn{min-height:48px;min-width:48px}
+ .unified .u-btn{font-size:15px!important;padding:12px 18px}
+ .unified .u-icon{display:inline-grid;place-items:center}
+ .unified input:not([type=checkbox]):not([type=radio]):not([type=color]),.unified select,.unified textarea{font-size:16px;min-height:48px}
+ .unified input[type=checkbox]{width:22px;height:22px;accent-color:var(--brand)}
+ .unified .u-pagination .u-btn{min-height:48px;font-size:14px!important}
+}
+@media(max-width:600px){.u-shift-button>span{display:none}.u-shift-button{padding:12px!important}.u-study-tools{align-items:stretch}.u-study-tools>.u-btn{width:100%}.unified .u-lesson-copy{font-size:17px;line-height:1.85}.unified .u-lesson .u-radio{min-height:52px;font-size:16px;padding:14px}.unified .u-lesson footer{display:flex;flex-direction:column;align-items:stretch;gap:14px}.unified .u-lesson footer>.u-btn{width:100%}.u-outline-body>button{font-size:14px}.unified .u-topbar{gap:6px}.unified .u-notification-button{display:none}.unified .u-global-search input{min-width:0;width:100%}.unified .u-topbar .u-search{padding:0 10px}.u-study-focus .u-lesson-copy{font-size:18px}}
+@media(prefers-reduced-motion:reduce){.unified *,.unified *::before,.unified *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+@media print{.u-study-tools,.u-shift-button{display:none!important}}

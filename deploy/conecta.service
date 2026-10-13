@@ -1,0 +1,22 @@
+[Unit]
+Description=Conecta portal empresarial
+After=network.target
+[Service]
+Type=simple
+User=conecta
+Group=conecta
+WorkingDirectory=/www/server/conecta
+EnvironmentFile=/www/server/conecta-config/production.env
+# Ajustar a la ruta real de Node 24 instalado en aaPanel.
+ExecStart=/usr/bin/node /www/server/conecta/server/index.mjs
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=20
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/www/server/conecta-data /www/backup/conecta
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,10 @@
+node_modules
+dist
+data
+backups
+artifacts
+*.zip
+.git
+.env
+.git
+.DS_Store
