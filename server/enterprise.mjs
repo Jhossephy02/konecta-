@@ -30,7 +30,7 @@ export function enterprise({db,fail,text,json,body,hashPassword,demoEnabled}){
     await corp.route(req,res,url,user);if(res.writableEnded)return true;
     if(path==='/api/organization'&&method==='GET'){
       const people=companyUsers(user),p=permissionSummary(user);
-      const staff=p.users||p.payroll||user.role==='hr'?people.map(u=>({id:u.id,name:u.name,role:u.role,...Object.fromEntries(['area','position','site','supervisorId'].map(k=>[k,JSON.parse(u.profile)[k]||'']))})):[];
+      const staff=p.users||p.payroll||user.role==='hr'?people.map(u=>({id:u.id,loginId:db.prepare('SELECT identifier FROM login_identifiers WHERE user_id=?').get(u.id)?.identifier||u.email,name:u.name,role:u.role,...Object.fromEntries(['area','position','site','supervisorId'].map(k=>[k,JSON.parse(u.profile)[k]||'']))})):[];
       return json(res,200,{name:companyName(user),roles:companyRoles,permissions:p,staff});
     }
     const member=path.match(/^\/api\/organization\/users\/([\w-]+)$/);

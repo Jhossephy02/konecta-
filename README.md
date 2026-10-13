@@ -119,6 +119,11 @@ Esta entrega permite entregar boletas PDF preparadas por la empresa; no calcula 
 
 # konecta-
 
+## Acceso y recuperación
+
+El acceso inicial usa ID y contraseña. Administración puede crear trabajadores sin correo y entregarles un ID; cada persona registra y verifica su correo de recuperación desde Mi perfil. Configuración SMTP y límites del modo local: [docs/ACCESO-Y-RECUPERACION.md](docs/ACCESO-Y-RECUPERACION.md). Los correos locales de prueba no se envían realmente. Las cuentas que ya tenían MFA lo confirman en una pantalla posterior.
+
 ## Presentación comercial
 
 Con el servidor iniciado, abre `/brand/video.html` para reproducir y descargar el anuncio de Conecta con voz femenina. La versión animada editable está en `/brand/anuncio.html`. Guion y detalle de archivos: [docs/ANUNCIO-COMERCIAL.md](docs/ANUNCIO-COMERCIAL.md). La empresa de práctica «El Reino de las Alas · Demostración» conserva los datos ficticios de la simulación; no se ejecutó la limpieza cancelada.
+
