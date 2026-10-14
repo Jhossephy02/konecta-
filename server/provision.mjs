@@ -6,7 +6,8 @@ import {identity,validateDni} from './identity.mjs';
 const email=(process.env.CONECTA_SUPERADMIN_EMAIL||'').trim().toLowerCase();
 const name=(process.env.CONECTA_SUPERADMIN_NAME||'Superadmin').trim();
 const password=process.env.CONECTA_SUPERADMIN_PASSWORD||'';
-const requestedId=process.env.CONECTA_SUPERADMIN_ID?validateDni(process.env.CONECTA_SUPERADMIN_ID):undefined;
+const requestedId=process.env.CONECTA_SUPERADMIN_ID?String(process.env.CONECTA_SUPERADMIN_ID).trim():undefined;
+if(requestedId&&!/^(?:\d{8}|\d{11})$/.test(requestedId))throw Error('El ID debe ser DNI de 8 dígitos o RUC de 11 dígitos.');
 if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)||password.length<16){console.error('Configura CONECTA_SUPERADMIN_EMAIL y CONECTA_SUPERADMIN_PASSWORD (mínimo 16 caracteres). No se creó ninguna cuenta.');process.exit(1);}
 const path=resolve(process.env.DB_PATH||'data/portal.sqlite');mkdirSync(dirname(path),{recursive:true});const db=new DatabaseSync(path);
 db.exec('CREATE TABLE IF NOT EXISTS users(id TEXT PRIMARY KEY,email TEXT UNIQUE NOT NULL,name TEXT NOT NULL,role TEXT NOT NULL,password TEXT NOT NULL,profile TEXT NOT NULL)');
