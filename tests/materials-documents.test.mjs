@@ -41,13 +41,14 @@ test('materiales, importación y expediente respetan asignación, privacidad y c
  assert.equal((await raw('/employee-documents',pdf,supervisor,headers)).status,403);
  const document=await (await raw('/employee-documents',pdf,admin,headers)).json();assert.ok(document.id);
  assert.equal((await call('/employee-documents','GET',undefined,employee)).data.length,1);
+ const preview=await secureTestFetch(base+'/employee-documents/'+document.id+'?preview=1',{headers:{Cookie:employee}});assert.equal(preview.status,200);assert.match(preview.headers.get('content-disposition'),/^inline/);assert.equal(preview.headers.get('x-frame-options'),'SAMEORIGIN');assert.equal((await secureTestFetch(base+'/employee-documents/'+document.id+'?preview=1',{headers:{Cookie:supervisor}})).status,403);
  assert.equal((await call('/employee-documents','GET',undefined,supervisor)).data.length,0);
  assert.equal((await secureTestFetch(base+'/employee-documents/'+document.id,{headers:{Cookie:supervisor}})).status,403);
  assert.equal((await secureTestFetch(base+'/employee-documents/'+document.id,{headers:{Cookie:other}})).status,404);
  assert.equal((await call('/employee-documents/'+document.id+'/acknowledge','POST',{},admin)).status,403);
  assert.equal((await call('/employee-documents/'+document.id+'/acknowledge','POST',{},employee)).status,200);
  assert.ok((await call('/employee-documents','GET',undefined,employee)).data[0].acknowledged);
- const newUser={name:'Cumpleaños automático',password:'Local-Prueba-123456789',role:'employee',area:'Cocina',position:'Operario',site:'Sede',birthDate:'1998-10-13',startDate:'2026-10-13',phone:'+51999999999'};
+ const newUser={loginId:'00000019',name:'Cumpleaños automático',password:'Local-Prueba-123456789',role:'employee',area:'Cocina',position:'Operario',site:'Sede',birthDate:'1998-10-13',startDate:'2026-10-13',phone:'+51999999999'};
  assert.equal((await call('/users','POST',{...newUser,birthDate:'2026-02-30'},admin)).status,400);
  assert.equal((await call('/users','POST',newUser,admin)).status,201);
  const person=(await call('/bootstrap','GET',undefined,employee)).data.team.find(u=>u.name===newUser.name);assert.equal(person.birthDay,'10-13');assert.equal(person.birthDate,undefined);

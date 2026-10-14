@@ -1,0 +1,15 @@
+.u-icon-motion{display:inline-block;transform-origin:center;vertical-align:baseline}.u-welcome-symbol .u-motion-wave{transform-origin:70% 85%}.u-welcome-features{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px}.u-welcome-features>span{display:flex;gap:8px;align-items:center;background:#f0fdfa;color:#134e4a;padding:10px 12px;border-radius:12px;font-size:14px}.u-practice-status .fa-check-circle{color:#0f766e}
+@media(prefers-reduced-motion:no-preference){
+.u-motion-wave{animation:icon-friendly-wave 1.8s ease-in-out 2}
+.u-motion-tap{animation:icon-friendly-tap 1.4s ease-in-out 2}
+.u-motion-float{animation:icon-friendly-float 1.8s ease-in-out 2}
+.u-motion-pop{animation:icon-friendly-pop .6s cubic-bezier(.22,1,.36,1) 1}
+.u-motion-nudge{animation:icon-friendly-nudge 1.2s ease-in-out 2}
+@keyframes icon-friendly-wave{0%,60%,100%{transform:rotate(0)}15%{transform:rotate(18deg)}30%{transform:rotate(-12deg)}45%{transform:rotate(12deg)}}
+@keyframes icon-friendly-tap{0%,100%{transform:translateY(0) scale(1)}45%{transform:translateY(-4px) scale(1.08)}65%{transform:translateY(1px) scale(.96)}}
+@keyframes icon-friendly-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes icon-friendly-pop{0%{transform:scale(.65);opacity:.3}65%{transform:scale(1.13);opacity:1}100%{transform:scale(1);opacity:1}}
+@keyframes icon-friendly-nudge{0%,100%{transform:translateX(0)}50%{transform:translateX(4px)}}
+.u-btn:hover .u-motion-nudge,.u-btn:focus-visible .u-motion-nudge{transform:translateX(4px);transition:transform .2s}
+}
+@media(prefers-reduced-motion:reduce){.u-icon-motion{animation:none!important;transition:none!important;transform:none!important}}

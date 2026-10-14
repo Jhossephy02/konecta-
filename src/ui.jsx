@@ -1,6 +1,7 @@
+import './icon-motion.css';
 import {useEffect,useId,useRef} from 'react';
 export const date=value=>value?new Intl.DateTimeFormat('es-PE',{dateStyle:'medium',timeZone:'America/Bogota'}).format(new Date(value.length===10?value+'T12:00:00-05:00':value)):'—';
-export function Icon({name}){return <i className={`fas fa-${name}`} aria-hidden="true"/>;}
+export function Icon({name,motion}){return <i className={`fas fa-${name}${motion?` u-icon-motion u-motion-${motion}`:''}`} aria-hidden="true"/>;}
 export function Badge({children}){return <span className={`u-badge s-${String(children).toLowerCase().replaceAll(' ','-')}`}>{children}</span>;}
 export function Empty({title='Aún no hay registros',children}){return <div className="u-empty"><Icon name="folder-open"/><h3>{title}</h3><p>{children||'Los registros que crees aparecerán aquí.'}</p></div>;}
 export function Modal({title,onClose,children,wide=false}){const ref=useRef(null),callback=useRef(onClose),id=useId();callback.current=onClose;useEffect(()=>{const el=ref.current;el.showModal();const close=e=>{e.preventDefault();callback.current();};el.addEventListener('cancel',close);return()=>{el.removeEventListener('cancel',close);el.close();};},[]);return <dialog aria-labelledby={id} className={`u-modal ${wide?'wide':''}`} ref={ref} onClick={e=>{if(e.target===ref.current)onClose();}}><header><h2 id={id}>{title}</h2><button type="button" className="u-icon" onClick={onClose} aria-label="Cerrar"><Icon name="times"/></button></header>{children}</dialog>;}

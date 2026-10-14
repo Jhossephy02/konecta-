@@ -88,7 +88,7 @@ export function enterprise({db,fail,text,json,body,hashPassword,demoEnabled}){
         if(d.user_id!==user.id)fail(403,'Solo el destinatario puede confirmar recepción.');
         db.prepare('UPDATE payroll_documents SET acknowledged=COALESCE(acknowledged,?) WHERE id=?').run(new Date().toISOString(),d.id);audit(user,'Recepción de boleta confirmada',d.id);return json(res,200,{ok:true});
       }
-      if(!document[2]&&method==='GET'){audit(user,'Boleta descargada',d.id);res.writeHead(200,{'Content-Type':'application/pdf','Content-Disposition':`attachment; filename="${d.name}"`,'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});res.end(Buffer.from(d.bytes));return true;}
+      if(!document[2]&&method==='GET'){audit(user,url.searchParams.get('preview')==='1'?'Boleta visualizada':'Boleta descargada',d.id);res.writeHead(200,{'Content-Type':'application/pdf','Content-Security-Policy':"default-src 'none'; frame-ancestors 'self'",'X-Frame-Options':'SAMEORIGIN','Content-Disposition':`${url.searchParams.get('preview')==='1'?'inline':'attachment'}; filename="${d.name}"`,'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});res.end(Buffer.from(d.bytes));return true;}
     }
     return false;
   }

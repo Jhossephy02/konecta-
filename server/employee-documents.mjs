@@ -16,7 +16,7 @@ export function employeeDocuments({db,fail,json,body,companyUsers,audit}){
   const match=path.match(/^\/api\/employee-documents\/([\w-]+)(\/acknowledge)?$/);if(match){
    const d=db.prepare('SELECT * FROM employee_documents WHERE id=? AND company_id=?').get(match[1],tenant(user));if(!d)fail(404,'Documento no encontrado.');if(d.user_id!==user.id&&!manages(user))fail(403,'Este documento es privado.');
    if(match[2]&&req.method==='POST'){await body(req);if(d.user_id!==user.id)fail(403,'Solo el destinatario confirma recepción.');db.prepare('UPDATE employee_documents SET acknowledged=COALESCE(acknowledged,?) WHERE id=?').run(new Date().toISOString(),d.id);audit(user,'Recepción de documento confirmada',d.id);return json(res,200,{ok:true});}
-   if(!match[2]&&req.method==='GET'){res.writeHead(200,{'Content-Type':d.mime,'Content-Disposition':`attachment; filename*=UTF-8''${encodeURIComponent(d.name)}`,'Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff'});res.end(Buffer.from(d.bytes));return true;}
+   if(!match[2]&&req.method==='GET'){res.writeHead(200,{'Content-Type':d.mime,'Content-Security-Policy':"default-src 'none'; frame-ancestors 'self'",'X-Frame-Options':'SAMEORIGIN','Content-Disposition':`${new URL(req.url,'http://localhost').searchParams.get('preview')==='1'?'inline':'attachment'}; filename*=UTF-8''${encodeURIComponent(d.name)}`,'Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff'});res.end(Buffer.from(d.bytes));return true;}
   }
   return false;
  }return {route};

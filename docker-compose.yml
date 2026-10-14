@@ -4,16 +4,30 @@ services:
     ports:
       - "127.0.0.1:8080:3001"
     environment:
-      DEMO_MODE: ${DEMO_MODE:-true}
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 3001
+      DB_PATH: /app/data/portal.sqlite
+      BACKUP_DIR: /app/backups
+      DEMO_MODE: "false"
+      PUBLIC_ORIGIN: ${PUBLIC_ORIGIN:?Configura el dominio HTTPS}
+      SESSION_SECRET: ${SESSION_SECRET:?Configura una clave privada de al menos 48 caracteres}
+      MAIL_MODE: ${MAIL_MODE:-disabled}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-465}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      MAIL_FROM: ${MAIL_FROM:-}
     volumes:
       - portal-data:/app/data
       - portal-backups:/app/backups
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3001/api/config').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      test: ["CMD", "node", "-e", "const u=new URL(process.env.PUBLIC_ORIGIN);require('http').get({host:'127.0.0.1',port:3001,path:'/api/config',headers:{Host:u.host,'X-Forwarded-Proto':'https'}},r=>{r.resume();process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))"]
       interval: 30s
       timeout: 5s
       retries: 3
+      start_period: 20s
 volumes:
   portal-data:
   portal-backups:

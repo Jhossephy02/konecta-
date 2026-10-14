@@ -12,6 +12,7 @@ FROM node:24-alpine
 WORKDIR /app
 COPY --from=build /app/dist ./dist
 COPY server ./server
+COPY src/industries.mjs src/onboarding-context.mjs ./src/
 COPY --from=build /app/node_modules ./node_modules
 RUN mkdir -p data backups && chown -R node:node /app
 USER node

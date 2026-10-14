@@ -18,9 +18,9 @@ test('SaaS: Superadmin, alta de empresas, marca y permisos de cursos',async t=>{
  try{await ready;
   root=(await call('/demo','POST',{role:'superadmin'})).cookie;otherOwner=(await call('/demo','POST',{role:'admin',company:'demo-company-b'})).cookie;
   await t.test('solo Superadmin integra empresas y crea su administrador',async()=>{
-   const body={name:'Empresa Nueva',slug:'empresa-nueva',adminName:'Dueño de prueba',...ownerCredentials,accent:'#1465d9'};
+   const body={ruc:'20000000001',industry:'restaurant',loginId:'00000013',name:'Empresa Nueva',slug:'empresa-nueva',adminName:'Dueño de prueba',...ownerCredentials,accent:'#1465d9'};
    assert.equal((await call('/platform/companies','POST',body,otherOwner)).status,403);
-   const r=await call('/platform/companies','POST',body,root);assert.equal(r.status,201);company=r.data.id;assert.equal(r.data.url,'/conecta/empresa-nueva/');assert.ok(!('password' in r.data));
+   assert.equal((await call('/platform/companies','POST',{...body,ruc:'123'},root)).status,400);assert.equal((await call('/platform/companies','POST',{...body,industry:'invalid'},root)).status,400);const r=await call('/platform/companies','POST',body,root);assert.equal(r.status,201);company=r.data.id;assert.equal(r.data.url,'/conecta/empresa-nueva/');const listed=(await call('/platform/companies','GET',undefined,root)).data.find(c=>c.id===company);assert.equal(listed.industry,'restaurant');assert.equal(listed.ruc,'20000000001');assert.equal((await call('/platform/companies','POST',{...body,slug:'another-company',email:'other-ruc@empresa.test',loginId:'00000099'},root)).status,409);assert.ok(!('password' in r.data));
    assert.equal((await call('/platform/companies','POST',body,root)).status,409);
    owner=(await call('/login','POST',ownerCredentials)).cookie;assert.ok(owner);
    const data=(await call('/bootstrap','GET',undefined,owner)).data;assert.equal(data.user.companyInfo.slug,'empresa-nueva');assert.equal(data.user.companyInfo.accent,'#1465d9');assert.equal(data.user.role,'admin');assert.equal(data.user.permissions.platform,false);assert.equal(data.team.length,1);
@@ -28,9 +28,9 @@ test('SaaS: Superadmin, alta de empresas, marca y permisos de cursos',async t=>{
    assert.equal((await call('/platform/context','POST',{companyId:'demo-company-b'},owner)).status,403);
   });
   await t.test('dueño genera cuentas propias y no puede crear Superadmins',async()=>{
-   const staff={name:'Trabajador de empresa',email:'personal@empresa.test',password:'Clave-personal-prueba-123',role:'employee',area:'Operaciones',position:'Operario',site:'Principal'};
+   const staff={loginId:'00000014',name:'Trabajador de empresa',email:'personal@empresa.test',password:'Clave-personal-prueba-123',role:'employee',area:'Operaciones',position:'Operario',site:'Principal'};
    const r=await call('/users','POST',staff,owner);assert.equal(r.status,201);id=r.data.id;
-   managerId=(await call('/users','POST',{...staff,name:'Gerente de empresa',email:'gerente@empresa.test',role:'manager',position:'Gerente'},owner)).data.id;
+   managerId=(await call('/users','POST',{...staff,loginId:'00000015',name:'Gerente de empresa',email:'gerente@empresa.test',role:'manager',position:'Gerente'},owner)).data.id;
    employee=(await call('/login','POST',{email:staff.email,password:staff.password})).cookie;
    manager=(await call('/login','POST',{email:'gerente@empresa.test',password:staff.password})).cookie;
    assert.equal((await call('/users','POST',{...staff,email:'root@empresa.test',role:'superadmin'},owner)).status,400);

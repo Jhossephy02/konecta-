@@ -8,5 +8,5 @@ export function mailer(env=process.env){
  if(mode==='smtp'&&(!env.SMTP_HOST||!env.MAIL_FROM||!env.SMTP_USER||!env.SMTP_PASSWORD))throw Error('Configura SMTP_HOST, SMTP_USER, SMTP_PASSWORD y MAIL_FROM.');
  const port=Number(env.SMTP_PORT||465),transport=mode==='smtp'?nodemailer.createTransport({host:env.SMTP_HOST,port,secure:port===465,requireTLS:port!==465,auth:{user:env.SMTP_USER,pass:env.SMTP_PASSWORD},connectionTimeout:10000,socketTimeout:15000,tls:{minVersion:'TLSv1.2'}}):null;
  async function send(to,subject,text){if(mode==='disabled')throw Object.assign(Error('El envío de correo aún no está configurado. Contacta a Administración.'),{status:503});if(mode==='preview'){const dir=resolve(dirname(env.DB_PATH||'data/portal.sqlite'),'mail-preview');await mkdir(dir,{recursive:true,mode:0o700});await writeFile(join(dir,randomUUID()+'.json'),JSON.stringify({to,subject,text,created:new Date().toISOString()}),{mode:0o600});return;}await transport.sendMail({from:env.MAIL_FROM,to,subject,text});}
- return {mode,send};
+ return {mode,send,verify:async()=>{if(!transport)throw Error('Configura MAIL_MODE=smtp antes de verificar el servicio.');return transport.verify();}};
 }

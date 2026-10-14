@@ -75,9 +75,9 @@ test('producción: HTTPS, MFA, recuperación y sesiones revocadas',async t=>{
    assert.equal((await f.call('/login','POST',{email:'root@security.test',password,recoveryCode:codes[0]})).status,401);
   });
   await t.test('token de recuperación es temporal, de una cuenta y de un uso',async()=>{
-   company=(await f.call('/platform/companies','POST',{name:'Empresa seguridad',slug:'empresa-security',adminName:'Dueño',email:'owner@security.test',password:'Clave-empresa-prueba-123456'},cookie)).data.id;
+   company=(await f.call('/platform/companies','POST',{ruc:'20000000002',industry:'hardware',loginId:'00000017',name:'Empresa seguridad',slug:'empresa-security',adminName:'Dueño',email:'owner@security.test',password:'Clave-empresa-prueba-123456'},cookie)).data.id;
    assert.equal((await f.call('/platform/context','POST',{companyId:company},cookie)).status,200);
-   person=(await f.call('/users','POST',{name:'Trabajador prueba',email:'worker@security.test',password:'Clave-personal-prueba-123456',role:'employee',area:'A',position:'Operario',site:'A'},cookie)).data.id;
+   person=(await f.call('/users','POST',{loginId:'00000018',name:'Trabajador prueba',email:'worker@security.test',password:'Clave-personal-prueba-123456',role:'employee',area:'A',position:'Operario',site:'A'},cookie)).data.id;
    const token=await f.call(`/auth/users/${person}/reset`,'POST',{currentPassword:password},cookie);assert.equal(token.status,200);assert.equal(token.data.expiresIn,900);
    assert.equal((await f.call('/auth/recover','POST',{email:'otro@security.test',token:token.data.token,newPassword:'Nueva-clave-personal-segura-123456'})).status,400);
    assert.equal((await f.call('/auth/recover','POST',{email:'worker@security.test',token:token.data.token,newPassword:'Nueva-clave-personal-segura-123456'})).status,200);

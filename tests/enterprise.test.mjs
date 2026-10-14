@@ -25,7 +25,7 @@ test('empresa: matriz de cargos, jerarquía, privacidad y separación de empresa
    medical=(await call('/records','POST',{module:'descansos',data:{title:'Descanso privado',date:'2026-10-21',endDate:'2026-10-22',description:'Dato clínico privado'}},a('employee'))).data.id;
    medicalAbsence=(await call('/records','POST',{module:'ausencias',data:{...absence,title:'Descanso Médico'}},a('employee'))).data.id;
    const r=await call(`/records/${medical}/attachment`,'POST',Buffer.from('Evidencia privada'),a('employee'),{'Content-Type':'text/plain','X-File-Name':'privado.txt'});assert.equal(r.status,201);fileId=r.data.id;
-   const u=await call('/users','POST',{name:'Persona fuera del equipo',email:'externo@demo.test',password:'Clave-local-prueba-123',role:'employee',area:'Ventas',position:'Asistente de ventas',site:'Otra sede'},a('admin'));assert.equal(u.status,201);outsiderId=u.data.id;
+   const u=await call('/users','POST',{loginId:'00000012',name:'Persona fuera del equipo',email:'externo@demo.test',password:'Clave-local-prueba-123',role:'employee',area:'Ventas',position:'Asistente de ventas',site:'Otra sede'},a('admin'));assert.equal(u.status,201);outsiderId=u.data.id;
   });
   for(const role of roles)await t.test(`matriz de permisos: ${role.label}`,async()=>{
    const cookie=a(role.id),d=(await call('/bootstrap','GET',undefined,cookie)).data;
@@ -40,7 +40,7 @@ test('empresa: matriz de cargos, jerarquía, privacidad y separación de empresa
    assert.equal((await call('/audit','GET',undefined,cookie)).status,['admin','superadmin','hr'].includes(role.id)?200:403);
    const c=await call('/course-catalog','POST',course,cookie);assert.equal(c.status,['admin','superadmin','trainer'].includes(role.id)?201:403);if(role.id==='trainer')courseId=c.data.id;
    const p=await call('/content','POST',{type:'anuncios',data:{title:'Comunicado privado Aurora',description:'Información de empresa A'}},cookie);assert.equal(p.status,['admin','superadmin','hr','trainer','sst'].includes(role.id)?201:403);if(role.id==='hr')contentId=p.data.id;
-   assert.equal((await call('/users','POST',{name:'Nueva '+role.id,email:role.id+'@matrix.test',password:'Clave-local-prueba-123',role:'employee',position:'Cargo libre',area:'Operaciones',site:'Demo'},cookie)).status,['admin','superadmin'].includes(role.id)?201:403);
+   assert.equal((await call('/users','POST',{loginId:String(100+roles.indexOf(role)).padStart(8,'0'),name:'Nueva '+role.id,email:role.id+'@matrix.test',password:'Clave-local-prueba-123',role:'employee',position:'Cargo libre',area:'Operaciones',site:'Demo'},cookie)).status,['admin','superadmin'].includes(role.id)?201:403);
   });
   await t.test('supervisor revisa, RR. HH. decide, nadie aprueba su propia solicitud',async()=>{
    assert.equal((await call('/records/'+request,'PATCH',{status:'Aprobado'},a('supervisor'))).status,403);

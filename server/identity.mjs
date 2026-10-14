@@ -5,3 +5,5 @@ export function identity(db){
  function find(value){return db.prepare('SELECT u.* FROM users u LEFT JOIN login_identifiers i ON i.user_id=u.id WHERE i.identifier=? COLLATE NOCASE OR u.email=? COLLATE NOCASE').get(value,value);}
  return {ensure,find};
 }
+
+export function validateDni(value){if(typeof value!=="string"||!/^\d{8}$/.test(value.trim()))throw Object.assign(Error("Ingresa un DNI de 8 dígitos."),{status:400});return value.trim();}
