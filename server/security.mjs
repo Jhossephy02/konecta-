@@ -7,7 +7,7 @@ export function securityConfig(env=process.env){
  let origin;try{if(env.PUBLIC_ORIGIN)origin=new URL(env.PUBLIC_ORIGIN);}catch{throw Error('PUBLIC_ORIGIN inválido.');}
  if(production&&(env.DEMO_MODE==='true'||!origin||origin.protocol!=='https:'||origin.username||origin.password||origin.pathname!=='/'||origin.search||origin.hash||!env.SESSION_SECRET||env.SESSION_SECRET.length<48))throw Error('Producción requiere DEMO_MODE=false, PUBLIC_ORIGIN=https://dominio y SESSION_SECRET de al menos 48 caracteres.');
  const secret=env.SESSION_SECRET||randomBytes(48).toString('hex');
- return {production,demoEnabled,origin:origin?.origin,secret,sessionCookie:production?'__Host-portal_session':'portal_session',csrfCookie:production?'__Host-portal_csrf':'portal_csrf',trusted:new Set((env.TRUSTED_PROXY_IPS||'127.0.0.1,::1,::ffff:127.0.0.1').split(',').map(s=>s.trim()).filter(Boolean)),heartbeat:Math.max(250,Math.min(30000,Number(env.SSE_HEARTBEAT_MS)||15000))};
+ return {production,requireInitialPasswordChange:env.REQUIRE_INITIAL_PASSWORD_CHANGE==='true',requireAdminMfa:env.REQUIRE_ADMIN_MFA==='true',demoEnabled,origin:origin?.origin,secret,sessionCookie:production?'__Host-portal_session':'portal_session',csrfCookie:production?'__Host-portal_csrf':'portal_csrf',trusted:new Set((env.TRUSTED_PROXY_IPS||'127.0.0.1,::1,::ffff:127.0.0.1').split(',').map(s=>s.trim()).filter(Boolean)),heartbeat:Math.max(250,Math.min(30000,Number(env.SSE_HEARTBEAT_MS)||15000))};
 }
 export function createSecurity({db,config,userFor,permissions}){
  db.exec('CREATE TABLE IF NOT EXISTS auth_limits(key TEXT PRIMARY KEY,count INTEGER NOT NULL,until INTEGER NOT NULL)');

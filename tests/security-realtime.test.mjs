@@ -51,7 +51,7 @@ test('ataques HTTP: CSRF, sesiones, rutas y contenido',async t=>{
 });
 
 test('producción: HTTPS, MFA, recuperación y sesiones revocadas',async t=>{
- const f=await fixture({NODE_ENV:'production',DEMO_MODE:'false',PUBLIC_ORIGIN:'https://grupoamayo.com',SESSION_SECRET:'secreto-solo-de-pruebas-'.repeat(4)});let cookie,secret,codes,company,person;
+ const f=await fixture({NODE_ENV:'production',REQUIRE_INITIAL_PASSWORD_CHANGE:'true',REQUIRE_ADMIN_MFA:'true',DEMO_MODE:'false',PUBLIC_ORIGIN:'https://grupoamayo.com',SESSION_SECRET:'secreto-solo-de-pruebas-'.repeat(4)});let cookie,secret,codes,company,person;
  const initial='Clave-inicial-seguridad-123456',password='Nueva-clave-segura-de-prueba-123456';
  try{
   await t.test('rechaza HTTP y dominios distintos, exige cookie Secure',async()=>{
