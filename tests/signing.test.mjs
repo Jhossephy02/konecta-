@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {DatabaseSync} from 'node:sqlite';
+import {readFileSync} from 'node:fs';
 import {PDFDocument} from 'pdf-lib';
 import {signing,validateStrokes,diplomaPdf} from '../server/signing.mjs';
 import {validDeadline,overdue} from '../src/course-deadline.mjs';
@@ -13,6 +14,7 @@ test('fechas límite: fecha real, cierre al final del día de Perú y aprobados 
 });
 test('firma: destinatario, versión, consentimiento, inmutabilidad y PDF firmado',async()=>{
  const db=new DatabaseSync(':memory:');db.exec(`CREATE TABLE users(id TEXT PRIMARY KEY);INSERT INTO users VALUES('worker'),('other');CREATE TABLE progress(user_id TEXT,course_id TEXT,completed TEXT,score INTEGER);CREATE TABLE employee_documents(id TEXT,company_id TEXT,user_id TEXT,title TEXT,bytes BLOB);`);
+ db.exec('CREATE TABLE company_logos(company_id TEXT PRIMARY KEY,bytes BLOB)');const logo=readFileSync(new URL('../server/assets/franquisia-logo.png',import.meta.url));db.prepare('INSERT INTO company_logos VALUES(?,?)').run('paraiso',logo);
  const user={id:'worker',name:'María Salazar',role:'employee',profile:JSON.stringify({companyId:'paraiso'})},other={...user,id:'other'};
  const fail=(status,message)=>{throw Object.assign(Error(message),{status});};
  const service=signing({db,fail,json:(res,status,value)=>{res.status=status;res.value=value;return true;},body:async req=>req.body,allCourses:()=>[{id:'course',title:'Inducción Paraíso',duration:20,kind:'Capacitación'}],companyInfo:()=>({name:'Paraíso de las Alas'}),audit:()=>{}});
@@ -20,6 +22,7 @@ test('firma: destinatario, versión, consentimiento, inmutabilidad y PDF firmado
  await assert.rejects(call(user,'/api/diplomas/course'),e=>e.status===403);
  db.prepare('INSERT INTO progress VALUES(?,?,?,?)').run('worker','course','2026-10-14T12:00:00Z',100);
  const diploma=(await call(user,'/api/diplomas/course')).value;assert.equal(diploma.diploma.company,'Paraíso de las Alas');
+ assert.equal(diploma.diploma.companyLogo,logo.toString('base64'));assert.ok(diploma.diploma.platformLogo);db.prepare('UPDATE company_logos SET bytes=?').run(Buffer.from('new-logo'));assert.equal((await call(user,'/api/diplomas/course')).value.documentHash,diploma.documentHash);
  const strokes=[[[.1,.4],[.4,.7],[.8,.2]]];assert.throws(()=>validateStrokes([[[0,0],[Infinity,1]]]));assert.throws(()=>validateStrokes([]));
  await assert.rejects(call(user,'/api/signatures/course/course','POST',{strokes,consent:true,documentHash:'wrong'}),e=>e.status===409);
  await assert.rejects(call(user,'/api/signatures/course/course','POST',{strokes,documentHash:diploma.documentHash}),e=>e.status===409);
