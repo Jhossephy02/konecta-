@@ -1,0 +1,7 @@
+import {DatabaseSync} from 'node:sqlite';
+import {randomBytes,scryptSync} from 'node:crypto';
+import {showcaseAccounts} from './showcase-accounts.mjs';
+if(!process.argv.includes('--allow-demo-access'))throw Error('Solo para muestra: agrega --allow-demo-access.');
+const db=new DatabaseSync(process.env.DB_PATH||'data/portal.sqlite');db.exec('PRAGMA foreign_keys=ON;PRAGMA busy_timeout=5000');
+const hash=password=>{const salt=randomBytes(16).toString('hex');return salt+':'+scryptSync(password,salt,64).toString('hex');};
+db.exec('BEGIN IMMEDIATE');try{for(const {userId,alias}of showcaseAccounts){const u=db.prepare('SELECT * FROM users WHERE id=?').get(userId);if(!u)throw Error('Falta una cuenta de muestra. Importa primero el paquete de Paraíso.');const profile=JSON.parse(u.profile);if(!profile.showcase&&!profile.temporaryAccess)throw Error('La cuenta no está marcada como muestra. No se modificó.');const other=db.prepare('SELECT user_id FROM login_identifiers WHERE identifier=?').get(alias);if(other&&other.user_id!==userId)throw Error('El ID '+alias+' pertenece a otra cuenta. No se modificó.');db.prepare('UPDATE login_identifiers SET identifier=? WHERE user_id=?').run(alias,userId);db.prepare('UPDATE users SET password=? WHERE id=?').run(hash(alias),userId);db.prepare('DELETE FROM sessions WHERE user_id=?').run(userId);}db.exec('COMMIT');console.log('Accesos de muestra actualizados. El ID y la contraseña son el nombre del rol. No se modificaron otras cuentas.');}catch(e){db.exec('ROLLBACK');throw e;}finally{db.close();}
