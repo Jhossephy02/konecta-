@@ -1,6 +1,6 @@
 # Auditoría local de Franquisia — 15 de octubre de 2026
 
-Resultado: 91 pruebas aprobadas, 0 fallos. Compilación de producción correcta. `pnpm audit --prod` no reportó vulnerabilidades conocidas en las dependencias instaladas.
+Resultado: 92 pruebas aprobadas, 0 fallos. Compilación de producción correcta. `pnpm audit --prod` no reportó vulnerabilidades conocidas en las dependencias instaladas.
 
 ## Escenarios comprobados
 
@@ -38,3 +38,9 @@ pnpm audit --prod
 ```
 
 Desarrollador: cosmiko025.
+
+## Cierre de revisión
+
+- Prueba adicional: un diploma firmado con el formato anterior conserva exactamente su registro después de actualizar el sistema.
+- El panel de firma muestra su referencia y las huellas del documento y del registro, cuando están disponibles.
+- El límite de trazos se cuenta sobre toda la firma; Limpiar y Deshacer permiten corregirla sin sobrescribir una firma guardada.

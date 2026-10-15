@@ -46,3 +46,12 @@ test('firma: destinatario, versión, consentimiento, inmutabilidad y PDF firmado
  db.prepare('UPDATE employee_documents SET bytes=? WHERE id=?').run(Buffer.from('%PDF-changed'),'memo');await assert.rejects(call(user,'/api/signatures/document/memo'),e=>e.status===409);
  const diplomaBytes=await diplomaPdf(diploma.diploma);assert.equal((await PDFDocument.load(diplomaBytes)).getPageCount(),1);db.close();
 });
+test('las actualizaciones no reescriben un diploma firmado con el formato anterior',async()=>{
+ const db=new DatabaseSync(':memory:');db.exec("CREATE TABLE users(id TEXT PRIMARY KEY);INSERT INTO users VALUES('worker');CREATE TABLE progress(user_id TEXT,course_id TEXT,completed TEXT,score INTEGER);INSERT INTO progress VALUES('worker','old','2026-10-14T12:00:00Z',100);");
+ const fail=(status,message)=>{throw Object.assign(Error(message),{status});},user={id:'worker',name:'Persona ficticia',role:'employee',profile:JSON.stringify({companyId:'paraiso'})};
+ const service=signing({db,fail,json:(r,status,value)=>{r.value=value;return true;},body:async()=>({}),allCourses:()=>[{id:'old',title:'Curso original',duration:5}],companyInfo:()=>({name:'Empresa renombrada'}),audit:()=>{}});
+ const old=JSON.stringify({reference:'legacy',name:'Persona ficticia',company:'Empresa original',title:'Curso original',kind:'Curso',score:100,duration:5,completed:'2026-10-14T12:00:00Z'}),hash=createHash('sha256').update(old).digest('hex');
+ db.prepare('INSERT INTO diplomas VALUES(?,?,?,?,?)').run('legacy','worker','paraiso','old',old);
+ db.prepare('INSERT INTO document_signatures(id,user_id,company_id,kind,target_id,document_hash,strokes,signed_at,signer_name) VALUES(?,?,?,?,?,?,?,?,?)').run('old-signature','worker','paraiso','course','old',hash,'[[[0.1,0.2],[0.8,0.7]]]','2026-10-14T13:00:00Z','Persona ficticia');
+ const response={};await service.route({method:'GET'},response,'/api/diplomas/old',user);assert.equal(response.value.documentHash,hash);assert.equal(response.value.diploma.company,'Empresa original');assert.equal(db.prepare('SELECT snapshot FROM diplomas WHERE id=?').get('legacy').snapshot,old);db.close();
+});
