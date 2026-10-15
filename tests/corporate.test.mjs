@@ -88,6 +88,7 @@ test('SaaS: Superadmin, alta de empresas, marca y permisos de cursos',async t=>{
    assert.equal((await call('/course-catalog/'+course,'PATCH',{dueDate:'2020-01-01'},employee)).status,403);
    assert.equal((await call('/course-catalog/'+course,'PATCH',{dueDate:'2020-01-01'},otherOwner)).status,404);
    assert.equal((await call('/course-catalog/'+course,'PATCH',{dueDate:'2020-01-01'},owner)).status,200);
+   const staff=(await call('/workforce','GET',undefined,owner)).data.staff;assert.equal(staff.find(u=>u.id===id).courses.some(c=>c.id===course),false);assert.ok(staff.find(u=>u.id===managerId).courses.some(c=>c.id===course));
    const row=(await call('/course-management','GET',undefined,owner)).data.find(c=>c.id===course);assert.equal(row.dueDate,'2020-01-01');
    const diploma=await call('/diplomas/'+course,'GET',undefined,employee);assert.equal(diploma.status,200);assert.equal(diploma.data.diploma.score,100);
    assert.equal((await call('/diplomas/'+course,'GET',undefined,otherOwner)).status,403);

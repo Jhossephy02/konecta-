@@ -1,4 +1,4 @@
-# Conecta
+# Franquisia
 
 Portal empresarial en React con API Node.js y SQLite. Integra capacitación, personal, documentos laborales, boletas, solicitudes, comunicación y seguridad y salud. Cada empresa tiene su identidad, usuarios y permisos.
 
@@ -64,3 +64,7 @@ Las pruebas automáticas utilizan bases temporales. Sus datos ficticios solo se 
 La configuración para aaPanel está en `deploy` y [docs/PRODUCCION-AAPANEL.md](docs/PRODUCCION-AAPANEL.md). El repositorio incluye Dockerfile; requiere validar Docker y el entorno de servidor antes de desplegar. La limpieza de ejemplos no sustituye las pruebas de HTTPS, SMTP, recuperación, copias externas y dispositivos físicos.
 
 Guías de uso: [cursos y expedientes](docs/CURSOS-Y-EXPEDIENTES.md), [tablets](docs/TABLETS.md), [acceso y recuperación](docs/ACCESO-Y-RECUPERACION.md) y [empresas](docs/EMPRESAS.md). Los informes históricos describen validaciones anteriores; no son instrucciones para restaurar ejemplos en la instalación actual.
+
+## Crédito de desarrollo
+
+Desarrollado por **cosmiko025**. Véase [CREDITS.md](CREDITS.md).

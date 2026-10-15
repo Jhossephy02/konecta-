@@ -37,8 +37,9 @@ test('materiales, importación y expediente respetan asignación, privacidad y c
  assert.equal((await call('/course-catalog/'+course+'/assign','POST',{roles:['hr']},admin)).status,200);
  assert.equal((await secureTestFetch(base+'/learning-assets/'+asset.id,{headers:{Cookie:employee}})).status,403);
  for(const ext of ['docx','pdf']){const bytes=await readFile(`public/templates/evaluacion.${ext}`),r=await raw('/question-import',bytes,admin,{'X-File-Name':`evaluacion.${ext}`,'Content-Type':'application/octet-stream'});const value=await r.json();assert.equal(r.status,200,JSON.stringify(value));assert.equal(value.questions.length,2);assert.equal(value.questions[1].answer,1);}
- const pdf=await readFile('public/templates/evaluacion.pdf'),headers={'X-User-Id':'demo','X-Document-Title':'Contrato%20de%20prueba','X-Document-Type':'Contrato','X-File-Name':'contrato.pdf','Content-Type':'application/pdf'};
+ const pdf=await readFile('public/templates/evaluacion.pdf'),headers={'X-User-Id':'demo','X-Document-Title':'Contrato%20de%20prueba','X-Requires-Signature':'1','X-Document-Due-Date':'2026-12-31','X-Document-Type':'Contrato','X-File-Name':'contrato.pdf','Content-Type':'application/pdf'};
  assert.equal((await raw('/employee-documents',pdf,supervisor,headers)).status,403);
+ assert.equal((await raw('/employee-documents',pdf,admin,{...headers,'X-Document-Due-Date':'2026-02-30'})).status,400);
  const document=await (await raw('/employee-documents',pdf,admin,headers)).json();assert.ok(document.id);
  assert.equal((await call('/employee-documents','GET',undefined,employee)).data.length,1);
  const preview=await secureTestFetch(base+'/employee-documents/'+document.id+'?preview=1',{headers:{Cookie:employee}});assert.equal(preview.status,200);assert.match(preview.headers.get('content-disposition'),/^inline/);assert.equal(preview.headers.get('x-frame-options'),'SAMEORIGIN');assert.equal((await secureTestFetch(base+'/employee-documents/'+document.id+'?preview=1',{headers:{Cookie:supervisor}})).status,403);
@@ -47,7 +48,7 @@ test('materiales, importación y expediente respetan asignación, privacidad y c
  assert.equal((await secureTestFetch(base+'/employee-documents/'+document.id,{headers:{Cookie:other}})).status,404);
  assert.equal((await call('/employee-documents/'+document.id+'/acknowledge','POST',{},admin)).status,403);
  assert.equal((await call('/employee-documents/'+document.id+'/acknowledge','POST',{},employee)).status,200);
- assert.ok((await call('/employee-documents','GET',undefined,employee)).data[0].acknowledged);
+ const receipt=(await call('/employee-documents','GET',undefined,employee)).data[0];assert.ok(receipt.acknowledged);assert.equal(receipt.requires_signature,1);assert.equal(receipt.due_date,'2026-12-31');assert.equal(receipt.signed_at,null);
  const newUser={loginId:'00000019',name:'Cumpleaños automático',password:'Local-Prueba-123456789',role:'employee',area:'Cocina',position:'Operario',site:'Sede',birthDate:'1998-10-13',startDate:'2026-10-13',phone:'+51999999999'};
  assert.equal((await call('/users','POST',{...newUser,birthDate:'2026-02-30'},admin)).status,400);
  assert.equal((await call('/users','POST',newUser,admin)).status,201);

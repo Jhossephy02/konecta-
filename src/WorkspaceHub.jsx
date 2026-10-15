@@ -3,7 +3,7 @@ import './workspace-hub.css';
 export default function WorkspaceHub({data}){
  const p=data.user.permissions;
  const areas=[
-  {id:'learning',title:'Aprendizaje',icon:'graduation-cap',description:'Capacítate y conserva tu recorrido.',links:[['aprendizaje','Mis cursos'],['historial','Historial'],['certificados','Constancias']]},
+  {id:'learning',title:'Aprendizaje',icon:'graduation-cap',description:'Capacítate y conserva tu recorrido.',links:[['aprendizaje','Mis cursos'],['historial','Historial'],['certificados','Diplomas']]},
   {id:'people',title:'Mi vida laboral',icon:'id-card',description:'Tus documentos y solicitudes, a mano.',links:[['boletas','Boletas'],['faltas','Faltas y tardanzas'],['justificaciones','Justificaciones'],['ausencias','Ausencias'],['documentos','Documentos laborales']]},
   {id:'safety',title:'Seguridad y salud',icon:'shield-alt',description:'Prevención y atención en el trabajo.',links:[['iper','Peligros y controles'],['correctivos','Acciones correctivas'],['epp','Equipos de protección'],['descansos','Descanso médico']]},
   {id:'connect',title:'Mi empresa',icon:'bullhorn',description:'Información para mantenerte al día.',links:[['anuncios','Anuncios'],['sesiones','Sesiones'],['tareas','Tareas'],['biblioteca','Protocolos'],['checklist','Checklist']]},

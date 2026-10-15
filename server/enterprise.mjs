@@ -61,7 +61,7 @@ export function enterprise({db,fail,text,json,body,hashPassword,demoEnabled}){
       if(!permissionSummary(user).workforce)fail(403,'No tienes acceso al seguimiento de equipos.');
       let staff=companyUsers(user);
       if(['supervisor','manager','deputy'].includes(user.role))staff=staff.filter(u=>u.id===user.id||reportsTo(u,user,staff));
-      return json(res,200,{staff:staff.map(u=>({id:u.id,name:u.name,role:u.role,position:JSON.parse(u.profile).position,area:JSON.parse(u.profile).area,progress:db.prepare('SELECT course_id,score,completed FROM progress WHERE user_id=?').all(u.id)})),records:visible(user).filter(r=>r.user_id!==user.id).map(r=>({...r,data:JSON.parse(r.data)}))});
+      return json(res,200,{staff:staff.map(u=>({id:u.id,name:u.name,role:u.role,position:JSON.parse(u.profile).position,area:JSON.parse(u.profile).area,courses:corp.catalog(u).filter(c=>c.active!==false&&c.assigned!==false).map(c=>{const p=db.prepare('SELECT score,completed FROM progress WHERE user_id=? AND course_id=?').get(u.id,c.id);return {id:c.id,title:c.title,kind:c.kind||'Curso',dueDate:c.dueDate||null,score:p?.score??null,completed:p?.completed||null};}),progress:db.prepare('SELECT course_id,score,completed FROM progress WHERE user_id=?').all(u.id)})),records:visible(user).filter(r=>r.user_id!==user.id).map(r=>({...r,data:JSON.parse(r.data)}))});
     }
     if(path==='/api/audit'&&method==='GET'){
       if(!permissionSummary(user).audit)fail(403,'No tienes acceso a la auditoría.');

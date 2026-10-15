@@ -4,13 +4,18 @@ import {DatabaseSync} from 'node:sqlite';
 import {readFileSync} from 'node:fs';
 import {PDFDocument} from 'pdf-lib';
 import {signing,validateStrokes,diplomaPdf} from '../server/signing.mjs';
-import {validDeadline,overdue} from '../src/course-deadline.mjs';
+import {validDeadline,overdue,dueSoon,prioritizeTraining} from '../src/course-deadline.mjs';
 
 test('fechas límite: fecha real, cierre al final del día de Perú y aprobados conservados',()=>{
  assert.equal(validDeadline('2026-02-30'),false);assert.equal(validDeadline('2026-10-31'),true);assert.equal(validDeadline(''),true);
  assert.equal(overdue({dueDate:'2026-10-14'},false,Date.parse('2026-10-15T04:59:59Z')),false);
  assert.equal(overdue({dueDate:'2026-10-14'},false,Date.parse('2026-10-15T05:00:00Z')),true);
  assert.equal(overdue({dueDate:'2026-10-14'},true,Date.now()+1e12),false);
+});
+test('prioriza vencidos y fechas próximas antes de cursos en progreso',()=>{
+ const now=Date.parse('2026-10-14T12:00:00Z'),courses=[{id:'progress'},{id:'later',dueDate:'2027-01-01'},{id:'done',dueDate:'2026-10-01'},{id:'soon',dueDate:'2026-10-16'},{id:'late',dueDate:'2026-10-10'}];
+ assert.equal(dueSoon(courses[3],false,now),true);assert.equal(dueSoon(courses[4],false,now),false);
+ assert.deepEqual(prioritizeTraining(courses,[{course_id:'progress',lessons:[0]},{course_id:'done',completed:'2026-10-01'}],now).map(c=>c.id),['late','soon','progress','later']);
 });
 test('firma: destinatario, versión, consentimiento, inmutabilidad y PDF firmado',async()=>{
  const db=new DatabaseSync(':memory:');db.exec(`CREATE TABLE users(id TEXT PRIMARY KEY);INSERT INTO users VALUES('worker'),('other');CREATE TABLE progress(user_id TEXT,course_id TEXT,completed TEXT,score INTEGER);CREATE TABLE employee_documents(id TEXT,company_id TEXT,user_id TEXT,title TEXT,bytes BLOB);`);
