@@ -13,3 +13,5 @@ body:has(.u-sidebar.open) .u-practice-coach{position:fixed;top:auto;bottom:12px;
 }
 @media(prefers-reduced-motion:reduce){.u-practice-shade,.u-practice-coach,.u-practice-target{animation:none!important;transition:none!important}.u-practice-shade mask rect{transition:none!important}}
 .u-welcome-guide{padding:8px 0}.u-welcome-guide h3{font-size:24px;line-height:1.35}.u-welcome-guide p{font-size:17px;line-height:1.65}.u-welcome-symbol{display:inline-flex;align-items:center;justify-content:center;background:#ccfbf1;color:#0f766e;border-radius:20px;width:64px;height:64px;font-size:30px}.u-welcome-guide footer{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}.u-welcome-guide footer button{min-height:48px}@media(max-width:600px){.u-welcome-guide footer button{width:100%}}@media(prefers-reduced-motion:no-preference){.u-welcome-symbol{animation:practice-coach-in .5s ease-out}}
+/* A transformed dialog makes fixed tutorial masks scroll with the form. */
+.u-modal[open]:has(.u-practice-coach){animation:none!important;transform:none!important;overflow-x:hidden}

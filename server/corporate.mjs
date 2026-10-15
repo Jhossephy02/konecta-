@@ -2,6 +2,7 @@ import {validDeadline} from '../src/course-deadline.mjs';
 import {industries} from '../src/industries.mjs';
 import {identity,validateDni} from './identity.mjs';
 import {randomUUID} from 'node:crypto';
+import sharp from 'sharp';
 import {companyRoles,tenant,owner,permissionSummary,configurePolicies} from './access.mjs';
 
 export function corporate({db,fail,text,json,body,hashPassword,companyUsers,audit}){
@@ -40,6 +41,7 @@ export function corporate({db,fail,text,json,body,hashPassword,companyUsers,audi
         if(!owner(user))fail(403,'Solo el dueño o Superadmin puede cambiar el logo.');const mime=req.headers['content-type']?.split(';')[0];if(!['image/png','image/jpeg','image/webp'].includes(mime))fail(400,'Usa un logo PNG, JPG o WebP.');
         const accent=String(req.headers['x-brand-color']||'');if(!/^#[0-9a-f]{6}$/i.test(accent))fail(400,'Color de marca inválido.');let size=0;const chunks=[];for await(const chunk of req){size+=chunk.length;if(size>2*1024*1024)fail(413,'Logo máximo 2 MB.');chunks.push(chunk);}req.checkAuth?.();const bytes=Buffer.concat(chunks);
         const valid=mime==='image/png'?bytes.subarray(0,8).toString('hex')==='89504e470d0a1a0a':mime==='image/jpeg'?bytes.subarray(0,3).toString('hex')==='ffd8ff':bytes.subarray(0,4).toString()==='RIFF'&&bytes.subarray(8,12).toString()==='WEBP';if(!valid)fail(400,'El archivo no corresponde al tipo de imagen.');
+        try{await sharp(bytes,{limitInputPixels:16_000_000}).resize({width:1600,height:1600,fit:'inside',withoutEnlargement:true}).png().toBuffer();}catch{fail(400,'No se puede abrir el logo. Usa una imagen válida de hasta 16 megapíxeles.');}req.checkAuth?.();
         db.exec('BEGIN IMMEDIATE');try{db.prepare('INSERT INTO company_logos VALUES(?,?,?) ON CONFLICT(company_id) DO UPDATE SET mime=excluded.mime,bytes=excluded.bytes').run(id,mime,bytes);db.prepare('UPDATE companies SET accent=?,brand_version=brand_version+1 WHERE id=?').run(accent,id);audit(user,'Logo y paleta actualizados',id);db.exec('COMMIT');}catch(e){db.exec('ROLLBACK');throw e;}return json(res,200,{ok:true});
       }
     }

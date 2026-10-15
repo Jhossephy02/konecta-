@@ -41,6 +41,7 @@ test('SaaS: Superadmin, alta de empresas, marca y permisos de cursos',async t=>{
    const headers={'Content-Type':'image/png','X-Brand-Color':'#1465d9'};
    assert.equal((await call('/company-logo','POST',logoPng(),employee,headers)).status,403);
    assert.equal((await call('/company-logo','POST',Buffer.from('Imagen falsa'),owner,headers)).status,400);
+   assert.equal((await call('/company-logo','POST',Buffer.from('89504e470d0a1a0a','hex'),owner,headers)).status,400);
    assert.equal((await call('/company-logo','POST',Buffer.from('<svg/>'),owner,{'Content-Type':'image/svg+xml','X-Brand-Color':'#1465d9'})).status,400);
    assert.equal((await call('/company-logo','POST',logoPng(),owner,headers)).status,200);
    const data=(await call('/bootstrap','GET',undefined,employee)).data;assert.equal(data.user.companyInfo.logo,true);assert.equal(data.user.companyInfo.accent,'#1465d9');

@@ -1,12 +1,14 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
 import {DatabaseSync} from 'node:sqlite';
 import {readFileSync} from 'node:fs';
 import {PDFDocument} from 'pdf-lib';
-import {signing,validateStrokes,diplomaPdf} from '../server/signing.mjs';
+import {signing,validateStrokes,diplomaPdf,businessDate} from '../server/signing.mjs';
 import {validDeadline,overdue,dueSoon,prioritizeTraining} from '../src/course-deadline.mjs';
 
 test('fechas límite: fecha real, cierre al final del día de Perú y aprobados conservados',()=>{
+ assert.equal(businessDate('2026-10-15T02:00:00Z'),'2026-10-14');
  assert.equal(validDeadline('2026-02-30'),false);assert.equal(validDeadline('2026-10-31'),true);assert.equal(validDeadline(''),true);
  assert.equal(overdue({dueDate:'2026-10-14'},false,Date.parse('2026-10-15T04:59:59Z')),false);
  assert.equal(overdue({dueDate:'2026-10-14'},false,Date.parse('2026-10-15T05:00:00Z')),true);
@@ -27,11 +29,14 @@ test('firma: destinatario, versión, consentimiento, inmutabilidad y PDF firmado
  await assert.rejects(call(user,'/api/diplomas/course'),e=>e.status===403);
  db.prepare('INSERT INTO progress VALUES(?,?,?,?)').run('worker','course','2026-10-14T12:00:00Z',100);
  const diploma=(await call(user,'/api/diplomas/course')).value;assert.equal(diploma.diploma.company,'Paraíso de las Alas');
- assert.equal(diploma.diploma.companyLogo,logo.toString('base64'));assert.ok(diploma.diploma.platformLogo);db.prepare('UPDATE company_logos SET bytes=?').run(Buffer.from('new-logo'));assert.equal((await call(user,'/api/diplomas/course')).value.documentHash,diploma.documentHash);
+ assert.equal(diploma.diploma.companyLogoRef,createHash('sha256').update(logo).digest('hex'));assert.ok(diploma.diploma.platformLogoRef);assert.equal(db.prepare('SELECT count(*) n FROM diploma_brand_assets').get().n,1);db.prepare('UPDATE company_logos SET bytes=?').run(Buffer.from('new-logo'));assert.equal((await call(user,'/api/diplomas/course')).value.documentHash,diploma.documentHash);
  const strokes=[[[.1,.4],[.4,.7],[.8,.2]]];assert.throws(()=>validateStrokes([[[0,0],[Infinity,1]]]));assert.throws(()=>validateStrokes([]));
  await assert.rejects(call(user,'/api/signatures/course/course','POST',{strokes,consent:true,documentHash:'wrong'}),e=>e.status===409);
  await assert.rejects(call(user,'/api/signatures/course/course','POST',{strokes,documentHash:diploma.documentHash}),e=>e.status===409);
  assert.equal((await call(user,'/api/signatures/course/course','POST',{strokes,consent:true,documentHash:diploma.documentHash})).status,201);
+ const receipt=(await call(user,'/api/signatures/course/course')).value.signature;assert.match(receipt.evidenceHash,/^[a-f0-9]{64}$/);assert.ok(receipt.reference);
+ db.prepare("UPDATE document_signatures SET strokes=? WHERE kind='course'").run(JSON.stringify([[[0,0],[1,1]]]));await assert.rejects(call(user,'/api/signatures/course/course'),e=>e.status===409);db.prepare("UPDATE document_signatures SET strokes=? WHERE kind='course'").run(JSON.stringify(strokes));
+ const asset=db.prepare('SELECT * FROM diploma_brand_assets').get();db.prepare('UPDATE diploma_brand_assets SET bytes=? WHERE hash=?').run(Buffer.from('corrupted'),asset.hash);await assert.rejects(call(user,'/api/diplomas/course/pdf'),e=>e.status===409);db.prepare('UPDATE diploma_brand_assets SET bytes=? WHERE hash=?').run(asset.bytes,asset.hash);
  await assert.rejects(call(user,'/api/signatures/course/course','POST',{strokes,consent:true,documentHash:diploma.documentHash}),e=>e.status===409);
  const original=await PDFDocument.create();original.addPage();const bytes=await original.save();db.prepare('INSERT INTO employee_documents VALUES(?,?,?,?,?)').run('memo','paraiso','worker','Memo de prueba',bytes);
  await assert.rejects(call(other,'/api/signatures/document/memo'),e=>e.status===403);
