@@ -1,3 +1,4 @@
+import {overdue} from './course-deadline.mjs';
 import {useEffect,useRef,useState} from 'react';
 import {Icon,Badge,Empty} from './ui';
 
@@ -12,12 +13,12 @@ export default function CoursePlayer({course,data,mutate,onFinish}){
  const finished=lessons.length===course.lessons.length;
  const pct=Math.round(lessons.length/course.lessons.length*100);
  useEffect(()=>{if(first.current){first.current=false;return;}stage.current?.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});},[lesson,quiz]);
- if(course.active===false||course.assigned===false)return <><a className="u-back" href="#historial">Volver a mi historial</a><Empty title={course.active===false?'Curso retirado':'Curso sin asignación vigente'}>Tu progreso, historial y constancias existentes se conservan.</Empty><a className="u-btn" href="#certificados">Ver mis constancias</a></>;
+ if(course.active===false||course.assigned===false)return <><a className="u-back" href="#historial">Volver a mi historial</a><Empty title={course.active===false?'Curso retirado':'Curso sin asignación vigente'}>Tu progreso, historial y constancias existentes se conservan.</Empty><a className="u-btn" href="#certificados">Ver mis diplomas</a></>;
  async function complete(){setBusy(true);setError('');try{await mutate(`/courses/${course.id}/lesson`,'POST',{lesson});if(lesson<course.lessons.length-1)setLesson(lesson+1);else setQuiz(true);}catch(e){setError(e.message);}finally{setBusy(false);}}
  return <div className={focus?'u-study u-study-focus':'u-study'} style={{'--study-text-size':textSize+'px'}}>
   <div className="u-study-tools"><a className="u-back" href="#aprendizaje"><Icon name="arrow-left"/> Volver a mi aprendizaje</a><button className="u-btn" aria-pressed={focus} onClick={()=>setFocus(!focus)}><Icon name={focus?'compress-alt':'book-reader'}/>{focus?'Salir del modo lectura':'Modo lectura'}</button></div>
   <div className="u-reading-controls" role="group" aria-label="Tamaño del texto"><span>Lectura cómoda</span><button type="button" className="u-btn" aria-label="Reducir tamaño del texto" disabled={textSize<=18} onClick={()=>setTextSize(s=>s-2)}>A−</button><output aria-live="polite">{textSize} px</output><button type="button" className="u-btn" aria-label="Aumentar tamaño del texto" disabled={textSize>=24} onClick={()=>setTextSize(s=>s+2)}>A+</button><small>Lección {lesson+1} de {course.lessons.length} · {pct}% completado</small></div>
-  <div className="u-page-head"><div><span className="u-eyebrow">{course.category} · {course.duration} MINUTOS</span><h1>{course.title}</h1><p>{course.description}</p></div>{progress?.completed&&<Badge>Completado</Badge>}</div>
+  <div className="u-page-head"><div><span className="u-eyebrow">{course.category} · {course.duration} MINUTOS</span><h1>{course.title}</h1><p>{course.description}</p>{course.dueDate&&<p role="status">Fecha límite: {course.dueDate} · {overdue(course,progress?.completed)?'Vencido: puedes completarlo y se registrará fuera de plazo.':'Completa tu formación a tiempo.'}</p>}</div>{progress?.completed&&<Badge>Completado</Badge>}</div>
   <div className="u-player">
    <aside><div className="u-outline-heading"><h3>Contenido del curso</h3><button className="u-icon" aria-label={outline?'Ocultar lecciones':'Ver lecciones'} aria-expanded={outline} aria-controls="course-outline" onClick={()=>setOutline(!outline)}><Icon name={outline?'chevron-up':'chevron-down'}/></button></div>
     <div id="course-outline" className="u-outline-body" hidden={!outline}>
@@ -30,7 +31,7 @@ export default function CoursePlayer({course,data,mutate,onFinish}){
     {error&&<p className="u-error" role="alert">{error}</p>}
     {quiz?<>
      <span className="u-eyebrow">COMPRUEBA LO APRENDIDO</span><h2>Evaluación final</h2><p>Responde todas las preguntas. Necesitas al menos 70% para aprobar.</p>
-     {result&&<div role="status" className={`u-result ${result.passed?'passed':''}`}><strong>{result.score}% · {result.passed?'¡Lo lograste!':'Sigue practicando'}</strong><p>{result.passed?'Tu constancia ya está disponible.':'Revisa las lecciones e inténtalo nuevamente.'}</p>{result.passed&&<><a className="u-btn" href="#certificados">Ver mis constancias <Icon name="award"/></a>{onFinish&&<button className="u-btn primary" onClick={onFinish}><Icon name="sign-out-alt"/> Terminar y cambiar trabajador</button>}</>}</div>}
+     {result&&<div role="status" className={`u-result ${result.passed?'passed':''}`}><strong>{result.score}% · {result.passed?'¡Lo lograste!':'Sigue practicando'}</strong><p>{result.passed?'Tu diploma ya está disponible.':'Revisa las lecciones e inténtalo nuevamente.'}</p>{result.passed&&<><a className="u-btn" href="#certificados">Ver mis diplomas <Icon name="award"/></a>{onFinish&&<button className="u-btn primary" onClick={onFinish}><Icon name="sign-out-alt"/> Terminar y cambiar trabajador</button>}</>}</div>}
      <form onSubmit={async e=>{e.preventDefault();setBusy(true);setError('');try{const values=new FormData(e.target);const answers=course.questions.map((_,i)=>Number(values.get('q'+i)));setResult(await mutate(`/courses/${course.id}/quiz`,'POST',{answers}));}catch(e){setError(e.message);}finally{setBusy(false);}}}>
       <div className="u-quiz-progress" role="status">{answered} de {course.questions.length} preguntas respondidas. Puedes revisar tus respuestas antes de enviar.</div>
       {course.questions.map((q,i)=><fieldset key={i} disabled={busy}><legend>{i+1}. {q.text}</legend>{q.options.map((option,j)=><label className={'u-radio'+(answers[i]===j?' selected':'')} key={j}><input type="radio" name={'q'+i} value={j} checked={answers[i]===j} onChange={()=>setAnswers(a=>({...a,[i]:j}))} required/>{option}</label>)}</fieldset>)}

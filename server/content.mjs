@@ -6,7 +6,7 @@ export const contentTypes = [
  {id:'biblioteca',title:'Documentos y protocolos',icon:'book-open',description:'Recursos y procedimientos para consultar.',fields:[['title','Título del recurso'],['type','Tipo','select','Documento|Protocolo|Guía'],['description','Contenido','textarea'],['url','Enlace al recurso (opcional)','url']]},
  {id:'videoteca',title:'Videoteca',icon:'play-circle',description:'Videos y recursos de formación.',fields:[['title','Título'],['description','Descripción','textarea'],['url','Enlace HTTPS del video','url']]},
  {id:'eleccion-voto',title:'Votación del CSST',icon:'vote-yea',description:'Procesos de elección y voto único por participante.',fields:[['title','Proceso electoral'],['description','Instrucciones','textarea'],['items','Una candidatura por línea','textarea'],['date','Fecha de cierre','date']]},
-];
+].map(def=>({...def,fields:[...def.fields,['dueDate','Fecha límite de participación (opcional)','date']]}));
 export const seedContent = [
  ['anuncios',{title:'Tres espacios. Una sola experiencia.',description:'Bienvenido a Conecta. Aquí puedes consultar seguridad y salud, registrar solicitudes y continuar tu aprendizaje. Este entorno contiene datos de ejemplo.'}],
  ['anuncios',{title:'Tu avance tiene un lugar',description:'Encuentra tus cursos en Mi aprendizaje. Al completar las lecciones y aprobar la evaluación podrás imprimir una constancia de demostración.'}],

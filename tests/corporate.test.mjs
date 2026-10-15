@@ -83,6 +83,16 @@ test('SaaS: Superadmin, alta de empresas, marca y permisos de cursos',async t=>{
    assert.equal((await call('/course-catalog/'+course+'/assign','POST',{roles:['employee']},otherOwner)).status,404);
    d=(await call('/bootstrap','GET',undefined,employee)).data;assert.equal(d.progress.find(p=>p.course_id===course).score,100);
   });
+  await t.test('fechas de formación y diplomas se validan y aíslan por empresa',async()=>{
+   assert.equal((await call('/course-catalog/'+course,'PATCH',{dueDate:'2026-02-30'},owner)).status,400);
+   assert.equal((await call('/course-catalog/'+course,'PATCH',{dueDate:'2020-01-01'},employee)).status,403);
+   assert.equal((await call('/course-catalog/'+course,'PATCH',{dueDate:'2020-01-01'},otherOwner)).status,404);
+   assert.equal((await call('/course-catalog/'+course,'PATCH',{dueDate:'2020-01-01'},owner)).status,200);
+   const row=(await call('/course-management','GET',undefined,owner)).data.find(c=>c.id===course);assert.equal(row.dueDate,'2020-01-01');
+   const diploma=await call('/diplomas/'+course,'GET',undefined,employee);assert.equal(diploma.status,200);assert.equal(diploma.data.diploma.score,100);
+   assert.equal((await call('/diplomas/'+course,'GET',undefined,otherOwner)).status,403);
+   assert.equal((await call('/course-catalog/'+course,'PATCH',{dueDate:''},owner)).status,200);
+  });
   await t.test('Superadmin cambia contexto de forma explícita y administra nuevas empresas',async()=>{
    assert.equal((await call('/platform/context','POST',{companyId:company},root)).status,200);
    const d=(await call('/bootstrap','GET',undefined,root)).data;assert.equal(d.user.companyInfo.id,company);assert.ok(d.user.permissions.users);assert.ok(d.team.some(u=>u.name==='Trabajador de empresa'));
