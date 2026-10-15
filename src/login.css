@@ -1,3 +1,29 @@
 .u-login-refined .u-login-inner{max-width:420px}.u-login-refined .u-login-inner>h2{letter-spacing:-.035em;font-size:clamp(30px,4vw,40px)}.u-login-refined input{min-height:54px}.u-password-input{position:relative}.u-password-input input{padding-right:60px!important}.u-password-toggle{position:absolute;right:6px;top:5px;width:44px;height:44px;border:0;border-radius:10px;color:#557080;background:transparent;cursor:pointer}.u-password-toggle:hover{background:#edf4f6}.u-forgot-link{display:block;margin:-2px 0 22px auto;min-height:44px;padding:8px 0;border:0;background:none;color:#0f766e;font:inherit;font-size:14px;font-weight:600;cursor:pointer}.u-login-help{font-size:13px!important;line-height:1.8;color:#667f8c;margin:24px 0!important}.u-login-notice{padding:12px 16px;background:#fff4d7;border-radius:12px;font-size:13px;line-height:1.7;color:#725213}.u-recovery-reminder{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:20px 24px;border:1px solid #c5e3da;border-radius:18px;background:#edf7f3;margin:24px 0}.u-recovery-reminder p{margin:6px 0 0;color:#55776b;font-size:14px}.u-recovery-reminder a{flex-shrink:0}@media(max-width:600px){.u-recovery-reminder{align-items:start;flex-direction:column}.u-login-refined .u-login-form{padding:28px 20px}}
 .u-password-input{width:100%}.u-password-input input{width:100%!important;max-width:none!important;box-sizing:border-box}
 .u-login-refined .u-password-input{display:flex;align-items:center;position:relative}.u-login-refined .u-password-input>input{margin:0!important;min-height:54px;padding-right:60px!important}.u-login-refined .u-password-input>.u-password-toggle{position:absolute!important;inset:auto 6px auto auto!important;top:50%!important;transform:translateY(-50%)!important;display:inline-flex!important;align-items:center;justify-content:center;width:44px!important;min-width:44px!important;height:44px!important;min-height:44px!important;padding:0!important;margin:0!important;line-height:1!important}.u-login-refined .u-password-toggle i{display:block;line-height:1;font-size:16px;pointer-events:none}
+/* Mobile login prioritizes credentials over the desktop presentation. */
+@media(max-width:600px){
+ .unified .u-login-refined{display:flex;flex-direction:column;min-height:100svh;background:#f8fafb}
+ .unified .u-login-refined .u-login-story{padding:20px 24px 12px;min-height:0;background:#f8fafb}
+ .unified .u-login-refined .u-login-story::after{display:none}
+ .unified .u-login-refined .u-login-story>div,.unified .u-login-refined .u-login-story>small{display:none}
+ .unified .u-login-refined .u-login-story>.u-brand{width:170px;margin:0}
+ .unified .u-login-refined .u-login-form{display:block;padding:16px 24px 24px;min-height:0}
+ .unified .u-login-refined .u-login-inner{width:100%;max-width:420px;margin:0 auto}
+ .unified .u-login-refined .u-login-inner>h2{font-size:28px;margin:10px 0 8px;line-height:1.2}
+ .unified .u-login-refined .u-login-inner>p{font-size:14px;line-height:1.5;margin:0}
+ .unified .u-login-refined .u-login-inner .u-eyebrow{font-size:10px}
+ .unified .u-login-refined .u-login-inner form{margin:22px 0 16px;gap:16px}
+ .unified .u-login-refined form label{font-size:14px;gap:8px;margin:0 0 16px}
+ .unified .u-login-refined input{font-size:16px;min-height:48px}
+ .unified .u-login-refined .u-password-input>input{min-height:48px}
+ .unified .u-login-refined .u-forgot-link{font-size:14px;margin:-4px 0 12px auto;padding:8px 0;min-height:44px}
+ .unified .u-login-refined form>.u-btn{width:100%;min-height:48px;margin:0;font-size:16px!important}
+ .unified .u-login-refined .u-login-help{font-size:12px!important;line-height:1.6;margin:16px 0 0!important}
+}
+@media(min-width:601px) and (max-width:900px){
+ .unified .u-login-refined{grid-template-columns:minmax(0,1fr) minmax(0,1.2fr)}
+ .unified .u-login-refined .u-login-story{padding:32px 24px}
+ .unified .u-login-refined .u-login-story h1{font-size:34px}
+ .unified .u-login-refined .u-login-form{padding:32px 24px}
+}
